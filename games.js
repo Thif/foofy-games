@@ -7,6 +7,11 @@ const games = [
     description: "Classic snake game",
     folder: "snake"
   },
+  {
+    name: "King Pinguin",
+    description: "Penguin adventure game",
+    folder: "kingpinguin"
+  },
 ];
 
 function renderGames() {
