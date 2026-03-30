@@ -1,12 +1,12 @@
-// Add your games here. Each game needs a name, description, emoji, and url.
+// Each game lives in its own folder with:
+//   - index.html (the game)
+//   - screenshot.png (shown on the portal)
 const games = [
-  // Example:
-  // {
-  //   name: "Snake",
-  //   description: "Classic snake game",
-  //   emoji: "🐍",
-  //   url: "/snake/"
-  // },
+  {
+    name: "Snake",
+    description: "Classic snake game",
+    folder: "snake"
+  },
 ];
 
 function renderGames() {
@@ -15,7 +15,7 @@ function renderGames() {
   if (games.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
-        <p>No games yet — add your first game to games.js!</p>
+        <p>No games yet — add your first game!</p>
       </div>
     `;
     return;
@@ -24,8 +24,8 @@ function renderGames() {
   grid.innerHTML = games
     .map(
       (game) => `
-    <a class="game-card" href="${game.url}">
-      <div class="thumbnail">${game.emoji}</div>
+    <a class="game-card" href="/${game.folder}/">
+      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}">
       <div class="info">
         <h2>${game.name}</h2>
         <p>${game.description}</p>
