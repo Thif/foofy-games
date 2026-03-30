@@ -129,11 +129,11 @@
   }
 
   .theme-grid {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding: 0 2rem;
+    max-width: 900px;
   }
 
   .theme-card {
@@ -142,7 +142,6 @@
     overflow: hidden;
     background: #1a1a2e;
     transition: transform 0.2s, box-shadow 0.2s;
-    width: 280px;
   }
 
   .theme-card:hover {
@@ -411,6 +410,14 @@
       <img src="prison.png" alt="Prison">
       <div class="label">Prison</div>
     </div>
+    <div class="theme-card" onclick="startGame('beach')">
+      <img src="beach.png" alt="Beach">
+      <div class="label">Beach</div>
+    </div>
+    <div class="theme-card" onclick="startGame('jungle')">
+      <img src="jungle.png" alt="Jungle">
+      <div class="label">Jungle</div>
+    </div>
   </div>
 </div>
 
@@ -525,6 +532,26 @@ const themes = {
       { x: 48, y: 88, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },  // among dishes on table bottom
       { x: 30, y: 35, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // in rubble/tunnel area
       { x: 70, y: 15, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // on guard tower wall top-right
+    ]
+  },
+  beach: {
+    image: 'beach.png',
+    eggs: [
+      { x: 8, y: 88, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },      // in sand near shells bottom-left
+      { x: 55, y: 72, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },     // next to sandcastle
+      { x: 85, y: 90, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },  // behind market stall bottom-right
+      { x: 12, y: 15, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // by beach cafe roof
+      { x: 70, y: 40, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // in water near inflatable
+    ]
+  },
+  jungle: {
+    image: 'jungle.png',
+    eggs: [
+      { x: 10, y: 60, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },     // in bushes near waterfall
+      { x: 82, y: 78, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },     // by stone tunnel entrance
+      { x: 45, y: 90, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },  // among rocks on path
+      { x: 75, y: 20, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // in treehouse area
+      { x: 25, y: 25, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // behind waterfall rocks
     ]
   }
 };
