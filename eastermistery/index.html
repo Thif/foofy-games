@@ -252,14 +252,15 @@
     content: '';
     position: absolute;
     inset: -8px;
-    border: 3px solid #ffd700;
+    border: 3px solid #00ffcc;
     border-radius: 50%;
-    animation: pulse 1s ease-in-out infinite;
+    box-shadow: 0 0 8px 3px #00ffcc, 0 0 16px 6px rgba(0, 255, 204, 0.5);
+    animation: pulse-glow 1s ease-in-out infinite;
   }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px 3px #00ffcc, 0 0 16px 6px rgba(0, 255, 204, 0.5); }
+    50% { opacity: 0.8; transform: scale(1.2); box-shadow: 0 0 12px 5px #00ffcc, 0 0 24px 10px rgba(0, 255, 204, 0.6); }
   }
 
   .miss-x {
@@ -289,7 +290,8 @@
 
   .hint-circle {
     position: absolute;
-    border: 3px solid rgba(255, 200, 0, 0.7);
+    border: 3px solid rgba(0, 255, 204, 0.7);
+    box-shadow: 0 0 10px 4px rgba(0, 255, 204, 0.5), 0 0 20px 8px rgba(0, 255, 204, 0.3);
     border-radius: 50%;
     pointer-events: none;
     z-index: 15;

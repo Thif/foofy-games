@@ -52,6 +52,16 @@ const games = [
     description: "Find 5 hidden eggs in a busy cartoon scene",
     folder: "eastermistery"
   },
+  {
+    name: "Multiply",
+    description: "Test your multiplication skills",
+    folder: "multiply"
+  },
+  {
+    name: "Divide",
+    description: "Test your division skills",
+    folder: "divide"
+  },
 ];
 
 async function renderGames() {

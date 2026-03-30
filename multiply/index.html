@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Times Tables!</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #5b67d8 0%, #9b51e0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .screen {
+      display: none;
+      background: #fff;
+      border-radius: 24px;
+      padding: 36px 40px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      animation: fadeUp 0.3s ease;
+    }
+    .screen.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 { font-size: 2.6rem; text-align: center; color: #2d2d5e; margin-bottom: 6px; }
+    h2 { font-size: 2rem; text-align: center; color: #2d2d5e; margin-bottom: 18px; }
+    .subtitle { text-align: center; color: #777; font-size: 1.05rem; margin-bottom: 28px; }
+    .section-label { font-weight: 700; color: #555; font-size: 1rem; margin-bottom: 10px; }
+    .back-link { display: block; text-align: center; margin-bottom: 16px; color: #9b51e0; text-decoration: none; font-size: 0.9rem; }
+    .back-link:hover { text-decoration: underline; }
+
+    .table-select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1.05rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      margin-bottom: 28px;
+      outline: none;
+      color: #333;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .table-select:focus { border-color: #9b51e0; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .btn + .btn { margin-top: 10px; }
+    .btn-primary {
+      background: linear-gradient(135deg, #5b67d8, #9b51e0);
+      color: #fff;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(155,81,224,0.45); }
+    .btn-ghost { background: #f0f0f5; color: #444; }
+    .btn-ghost:hover { background: #e4e4ee; transform: translateY(-1px); }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .progress-label { font-size: 1rem; font-weight: 600; color: #666; }
+
+    .progress-bar { height: 8px; background: #e8e8f0; border-radius: 4px; margin-bottom: 14px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5b67d8, #9b51e0);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    .timer-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .timer-bar { flex: 1; height: 10px; background: #e8e8f0; border-radius: 5px; overflow: hidden; }
+    .timer-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5b67d8, #9b51e0);
+      border-radius: 5px;
+      transition: width 0.9s linear, background 0.4s;
+    }
+    .timer-fill.warn   { background: #f6ad55; }
+    .timer-fill.danger { background: #e53e3e; }
+    .timer-count {
+      font-size: 1.3rem; font-weight: 800; color: #666;
+      min-width: 28px; text-align: right; transition: color 0.3s;
+    }
+    .timer-count.warn   { color: #c05621; }
+    .timer-count.danger { color: #e53e3e; }
+
+    .equation {
+      text-align: center; font-size: 3.6rem; font-weight: 900;
+      color: #1e1e3f; margin-bottom: 28px; letter-spacing: 2px;
+    }
+
+    .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+    .choice-btn {
+      padding: 22px 10px; font-size: 1.8rem; font-weight: 800;
+      border: 3px solid #e0e0e0; border-radius: 16px; cursor: pointer;
+      background: #fafafa; color: #1e1e3f;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s, opacity 0.3s;
+    }
+    .choice-btn:hover:not(:disabled) { border-color: #9b51e0; background: #f5eeff; transform: scale(1.04); }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.correct  { border-color: #38a169; background: #f0fff6; color: #38a169; }
+    .choice-btn.wrong    { border-color: #e53e3e; background: #fff5f5; color: #e53e3e; animation: shake 0.35s ease; }
+    .choice-btn.fading   { opacity: 0; transform: scale(0.8); pointer-events: none; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%     { transform: translateX(-8px); }
+      75%     { transform: translateX(8px); }
+    }
+
+    .feedback { text-align: center; margin-top: 14px; font-size: 1.1rem; font-weight: 700; min-height: 26px; }
+    .feedback.ok   { color: #38a169; }
+    .feedback.err  { color: #e53e3e; }
+    .feedback.hint { color: #c05621; }
+
+    .score-display {
+      text-align: center; font-size: 5.5rem; font-weight: 900;
+      color: #9b51e0; line-height: 1; margin: 12px 0 24px;
+    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+    .stat-box { background: #f7f8ff; border-radius: 14px; padding: 20px; text-align: center; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; color: #2d2d5e; }
+    .stat-label { font-size: 0.9rem; color: #999; margin-top: 4px; }
+    .encouragement { text-align: center; font-size: 1.3rem; color: #444; margin-bottom: 28px; }
+
+    .leaderboard { margin-top: 22px; }
+    .lb-title { font-size: 1rem; font-weight: 700; color: #888; text-align: center; margin-bottom: 10px; letter-spacing: 1px; }
+    .lb-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 10px; margin-bottom: 5px;
+      background: #f7f8ff;
+    }
+    .lb-row.lb-gold   { background: #fef9e7; }
+    .lb-row.lb-silver { background: #f4f4f4; }
+    .lb-row.lb-bronze { background: #fff4ee; }
+    .lb-rank  { font-weight: 800; color: #9b51e0; min-width: 22px; font-size: 0.95rem; }
+    .lb-name  { flex: 1; font-weight: 600; color: #333; font-size: 0.95rem; }
+    .lb-score { font-weight: 800; color: #5b67d8; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ SETUP SCREEN ══════════ -->
+<div id="setup-screen" class="screen active">
+  <a href="/" class="back-link">&larr; Back to games</a>
+  <h1>Times Tables!</h1>
+  <p class="subtitle">Practice makes perfect — let's go!</p>
+
+  <p class="section-label">Which table do you want to practice?</p>
+  <select id="table-select" class="table-select">
+    <option value="mix">Mix (random 1–10)</option>
+    <option value="1">1× table</option>
+    <option value="2">2× table</option>
+    <option value="3">3× table</option>
+    <option value="4">4× table</option>
+    <option value="5">5× table</option>
+    <option value="6">6× table</option>
+    <option value="7">7× table</option>
+    <option value="8">8× table</option>
+    <option value="9">9× table</option>
+    <option value="10">10× table</option>
+  </select>
+
+  <button class="btn btn-primary" onclick="startGame()">Start!</button>
+</div>
+
+<!-- ══════════ GAME SCREEN ══════════ -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <span class="progress-label" id="q-label">Question 1 / 10</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <div class="timer-row">
+    <div class="timer-bar">
+      <div class="timer-fill" id="timer-fill" style="width:100%"></div>
+    </div>
+    <span class="timer-count" id="timer-count">15</span>
+  </div>
+
+  <div class="equation" id="equation">3 × 4 = ?</div>
+  <div class="choices-grid" id="choices-grid"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<!-- ══════════ RESULTS SCREEN ══════════ -->
+<div id="results-screen" class="screen">
+  <h2 id="results-title">Well done!</h2>
+
+  <div class="score-display" id="score-display">10/10</div>
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-value" id="res-correct">10</div>
+      <div class="stat-label">Correct</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="res-wrong">0</div>
+      <div class="stat-label">Wrong</div>
+    </div>
+  </div>
+
+  <div class="encouragement" id="encouragement"></div>
+  <div class="leaderboard" id="leaderboard"></div>
+
+  <button class="btn btn-primary" onclick="startGame()" style="margin-top:16px">Play again!</button>
+  <button class="btn btn-ghost" onclick="show('setup-screen')">Change table</button>
+</div>
+
+<script>
+  const TOTAL         = 10;
+  const QUESTION_TIME = 15;
+
+  let questions = [];
+  let qIndex    = 0;
+  let score     = 0;
+  let accepting = true;
+
+  let questionTimer = null;
+  let timeLeft      = 0;
+  let hint1Done     = false;
+  let hint2Done     = false;
+
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function rnd(lo, hi) { return Math.floor(Math.random() * (hi - lo + 1)) + lo; }
+
+  function makeQuestions() {
+    const table = document.getElementById('table-select').value;
+    const qs = [], seen = new Set();
+    while (qs.length < TOTAL) {
+      const a = table === 'mix' ? rnd(1, 10) : parseInt(table);
+      const b = rnd(1, 10);
+      const k = `${a}x${b}`;
+      if (!seen.has(k)) { seen.add(k); qs.push({ a, b, ans: a * b }); }
+    }
+    return qs;
+  }
+
+  function startGame() {
+    stopTimer();
+    questions = makeQuestions();
+    qIndex    = 0;
+    score     = 0;
+    show('game-screen');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    accepting = true;
+    const q = questions[qIndex];
+    document.getElementById('q-label').textContent       = `Question ${qIndex + 1} / ${TOTAL}`;
+    document.getElementById('progress-fill').style.width = `${(qIndex / TOTAL) * 100}%`;
+    document.getElementById('equation').textContent      = `${q.a} \u00d7 ${q.b} = ?`;
+    document.getElementById('feedback').textContent      = '';
+    document.getElementById('feedback').className        = 'feedback';
+    buildChoices(q.ans);
+    startTimer();
+  }
+
+  function buildChoices(correct) {
+    const opts = makeChoices(correct);
+    const wrap = document.getElementById('choices-grid');
+    wrap.innerHTML = '';
+    opts.forEach(val => {
+      const btn = document.createElement('button');
+      btn.className   = 'choice-btn';
+      btn.textContent = val;
+      btn.onclick     = () => checkAnswer(val, btn, correct);
+      wrap.appendChild(btn);
+    });
+  }
+
+  function makeChoices(correct) {
+    const pool = new Set([correct]);
+    const candidates = [
+      correct - 1, correct + 1, correct - 2, correct + 2,
+      correct + 3, correct - 3, correct + 4, correct - 4,
+    ].filter(n => n > 0 && n !== correct);
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    for (const c of candidates) { if (pool.size >= 4) break; pool.add(c); }
+    let n = 1;
+    while (pool.size < 4) { if (!pool.has(n)) pool.add(n); n++; }
+    const arr = [...pool];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function checkAnswer(val, btn, correct) {
+    if (!accepting) return;
+    accepting = false;
+    stopTimer();
+    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+    const fb = document.getElementById('feedback');
+    if (val === correct) {
+      score++;
+      btn.classList.add('correct');
+      fb.textContent = ['Great job!', 'Correct!', 'Excellent!', 'Amazing!', 'Perfect!'][Math.floor(Math.random() * 5)];
+      fb.className   = 'feedback ok';
+    } else {
+      btn.classList.add('wrong');
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        if (+b.textContent === correct) b.classList.add('correct');
+      });
+      fb.textContent = `The answer was ${correct}!`;
+      fb.className   = 'feedback err';
+    }
+    setTimeout(() => {
+      qIndex++;
+      if (qIndex >= TOTAL) endGame();
+      else showQuestion();
+    }, 950);
+  }
+
+  /* Timer */
+  function startTimer() {
+    stopTimer();
+    timeLeft  = QUESTION_TIME;
+    hint1Done = false;
+    hint2Done = false;
+    updateTimerDisplay();
+
+    questionTimer = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+
+      if (!hint1Done && timeLeft <= Math.round(QUESTION_TIME * 0.6)) {
+        hint1Done = true;
+        removeOneWrongOption();
+        showHintMsg('One answer removed to help you!');
+      }
+      if (!hint2Done && timeLeft <= Math.round(QUESTION_TIME * 0.27)) {
+        hint2Done = true;
+        removeOneWrongOption();
+        showHintMsg("Now just two left \u2014 you\u2019ve got this!");
+      }
+      if (timeLeft <= 0) { stopTimer(); autoWrong(); }
+    }, 1000);
+  }
+
+  function stopTimer() { clearInterval(questionTimer); questionTimer = null; }
+
+  function updateTimerDisplay() {
+    const fill  = document.getElementById('timer-fill');
+    const count = document.getElementById('timer-count');
+    fill.style.width  = (timeLeft / QUESTION_TIME * 100) + '%';
+    count.textContent = timeLeft;
+    const danger = timeLeft <= 4;
+    const warn   = !danger && timeLeft <= 8;
+    fill.className  = 'timer-fill'  + (danger ? ' danger' : warn ? ' warn' : '');
+    count.className = 'timer-count' + (danger ? ' danger' : warn ? ' warn' : '');
+  }
+
+  function removeOneWrongOption() {
+    const correct = questions[qIndex].ans;
+    const visible = [...document.querySelectorAll('.choice-btn')]
+      .filter(b => b.style.display !== 'none' && !b.classList.contains('fading') && !b.disabled);
+    const wrong = visible.filter(b => +b.textContent !== correct);
+    if (!wrong.length) return;
+    const target = wrong[Math.floor(Math.random() * wrong.length)];
+    target.classList.add('fading');
+    setTimeout(() => { target.style.display = 'none'; }, 300);
+  }
+
+  function showHintMsg(msg) {
+    const fb = document.getElementById('feedback');
+    if (fb.classList.contains('ok') || fb.classList.contains('err')) return;
+    fb.textContent = msg;
+    fb.className   = 'feedback hint';
+  }
+
+  function autoWrong() {
+    if (!accepting) return;
+    accepting = false;
+    const correct = questions[qIndex].ans;
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      b.disabled = true;
+      if (+b.textContent === correct) b.classList.add('correct');
+    });
+    const fb = document.getElementById('feedback');
+    fb.textContent = `Time's up! The answer was ${correct}.`;
+    fb.className   = 'feedback err';
+    setTimeout(() => {
+      qIndex++;
+      if (qIndex >= TOTAL) endGame();
+      else showQuestion();
+    }, 1100);
+  }
+
+  /* End & results */
+  function endGame() {
+    stopTimer();
+    saveScore(score);
+
+    document.getElementById('score-display').textContent = `${score}/${TOTAL}`;
+    document.getElementById('res-correct').textContent   = score;
+    document.getElementById('res-wrong').textContent     = TOTAL - score;
+
+    const pct = score / TOTAL;
+    let title, msg;
+    if (pct === 1)      { title = 'Perfect!';    msg = 'You got every single one right — superstar!'; }
+    else if (pct >= .8) { title = 'Well done!';  msg = 'Nearly perfect — brilliant work!'; }
+    else if (pct >= .6) { title = 'Good job!';   msg = 'Solid effort — keep practicing!'; }
+    else                { title = 'Keep going!'; msg = "Practice every day and you'll smash it!"; }
+
+    document.getElementById('results-title').textContent = title;
+    document.getElementById('encouragement').textContent = msg;
+    renderLeaderboard();
+    show('results-screen');
+  }
+
+  function saveScore(sc) {
+    const table = document.getElementById('table-select').value;
+    let scores = JSON.parse(localStorage.getItem('ttScores') || '[]');
+    scores.push({ score: sc, total: TOTAL, table, date: Date.now() });
+    scores.sort((a, b) => b.score - a.score || a.date - b.date);
+    localStorage.setItem('ttScores', JSON.stringify(scores.slice(0, 50)));
+  }
+
+  function renderLeaderboard() {
+    const scores = JSON.parse(localStorage.getItem('ttScores') || '[]');
+    const wrap   = document.getElementById('leaderboard');
+    wrap.innerHTML = '';
+    if (!scores.length) return;
+    const title = document.createElement('p');
+    title.className = 'lb-title'; title.textContent = 'BEST SCORES';
+    wrap.appendChild(title);
+    scores.slice(0, 8).forEach((s, i) => {
+      const label = s.table === 'mix' ? 'Mix' : s.table + '×';
+      const row = document.createElement('div');
+      row.className = 'lb-row' + (i === 0 ? ' lb-gold' : i === 1 ? ' lb-silver' : i === 2 ? ' lb-bronze' : '');
+      row.innerHTML = `<span class="lb-rank">${['🥇','🥈','🥉'][i] || (i+1)+'.'}</span>
+                       <span class="lb-name">${label}</span>
+                       <span class="lb-score">${s.score}/${s.total}</span>`;
+      wrap.appendChild(row);
+    });
+  }
+</script>
+</body>
+</html>
