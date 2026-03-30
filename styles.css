@@ -19,11 +19,38 @@ header {
 }
 
 header h1 {
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
+  font-size: 5rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #ff6b6b);
+  background-size: 200% 200%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite, wobble 2s ease-in-out infinite;
+  text-shadow: 0 0 40px rgba(255, 107, 107, 0.3);
+  cursor: default;
+}
+
+header h1:hover {
+  animation: gradient-shift 1s ease infinite, bounce 0.5s ease;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(1.15) rotate(-3deg); }
+  60% { transform: scale(1.1) rotate(2deg); }
 }
 
 .tagline {

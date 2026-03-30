@@ -47,12 +47,36 @@ const games = [
     description: "Find all mines without clicking one",
     folder: "minesweeper"
   },
+  {
+    name: "Easter Mistery",
+    description: "Find 5 hidden eggs in a busy cartoon scene",
+    folder: "eastermistery"
+  },
 ];
 
-function renderGames() {
+async function renderGames() {
   const grid = document.getElementById("games-grid");
 
-  if (games.length === 0) {
+  // Load exclusion list from exclude.yaml
+  let excluded = [];
+  try {
+    const res = await fetch("/exclude.yaml");
+    const text = await res.text();
+    const match = text.match(/^excluded:\s*\[([^\]]*)\]/m);
+    if (match && match[1].trim()) {
+      excluded = match[1].split(",").map(s => s.trim().replace(/['"]/g, ""));
+    } else {
+      const lines = text.split("\n");
+      for (const line of lines) {
+        const entry = line.match(/^\s*-\s+(.+)/);
+        if (entry) excluded.push(entry[1].trim());
+      }
+    }
+  } catch (e) {}
+
+  const visible = games.filter(g => !excluded.includes(g.folder));
+
+  if (visible.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
         <p>No games yet — add your first game!</p>
@@ -61,7 +85,7 @@ function renderGames() {
     return;
   }
 
-  grid.innerHTML = games
+  grid.innerHTML = visible
     .map(
       (game) => `
     <a class="game-card" href="/${game.folder}/">

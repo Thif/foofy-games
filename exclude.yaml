@@ -1,0 +1,5 @@
+# Games to hide from the portal (by folder name)
+# Example:
+# - eastermistery
+# - pong
+excluded: [flappy-bird]

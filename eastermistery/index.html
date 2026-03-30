@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easter Mistery - Hidden Egg Hunt</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(15,15,26,0.92);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    border-bottom: 1px solid #2a2a3d;
+    height: 48px;
+  }
+  #header a {
+    color: #8888cc;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  #header a:hover { color: #aaaaee; }
+  #title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0c040;
+    letter-spacing: 1px;
+  }
+  #hud {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-size: 14px;
+  }
+  #egg-counter { color: #80e080; font-weight: 600; }
+  #timer { color: #e0c060; font-weight: 600; }
+
+  #game-container {
+    position: absolute;
+    top: 48px; left: 0; right: 0; bottom: 0;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a14;
+  }
+
+  #scene-wrapper {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+  }
+
+  #scene-wrapper img {
+    max-height: calc(100vh - 48px);
+    max-width: 100vw;
+    display: block;
+  }
+
+  .egg-zone {
+    position: absolute;
+    width: 30px;
+    height: 36px;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+  }
+
+  .egg-zone.found {
+    pointer-events: none;
+  }
+
+  .egg-zone.found::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border: 3px solid #ffd700;
+    border-radius: 50%;
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  .miss-x {
+    position: absolute;
+    pointer-events: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff4444;
+    z-index: 20;
+    animation: miss-fade 0.6s forwards;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes miss-fade {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -70%) scale(1.3); }
+  }
+
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    font-size: 28px;
+    z-index: 20;
+    animation: sparkle-pop 0.8s forwards;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes sparkle-pop {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; transform: translate(-50%, -80%) scale(1.3); }
+    100% { opacity: 0; transform: translate(-50%, -100%) scale(1); }
+  }
+
+  #win-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 26, 0.9);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  #win-overlay.show { display: flex; }
+
+  #win-overlay h2 {
+    font-size: 2.5rem;
+    color: #ffd700;
+  }
+
+  #win-overlay p {
+    font-size: 1.2rem;
+    color: #ccc;
+  }
+
+  #win-overlay button {
+    margin-top: 1rem;
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+    background: #2a2a4d;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  #win-overlay button:hover { background: #3a3a6d; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <a href="/">&larr; Back to games</a>
+  <span id="title">Easter Mistery</span>
+  <div id="hud">
+    <span id="egg-counter">0 / 5 eggs</span>
+    <span id="timer">0:00</span>
+  </div>
+</div>
+
+<div id="game-container">
+  <div id="scene-wrapper">
+    <img id="scene-img" src="scene_1.png" alt="Find the eggs!" draggable="false">
+  </div>
+</div>
+
+<div id="win-overlay">
+  <h2>You found all the eggs!</h2>
+  <p id="win-time"></p>
+  <button onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+const img = document.getElementById('scene-img');
+const wrapper = document.getElementById('scene-wrapper');
+const counterEl = document.getElementById('egg-counter');
+const timerEl = document.getElementById('timer');
+const winOverlay = document.getElementById('win-overlay');
+const winTime = document.getElementById('win-time');
+
+// Egg positions as percentage of image dimensions
+// Placed in busy spots that are tricky to notice
+const eggs = [
+  { x: 12, y: 72, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },
+  { x: 73, y: 18, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },
+  { x: 45, y: 55, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },
+  { x: 88, y: 78, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },
+  { x: 28, y: 30, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },
+];
+
+let found = 0;
+let startTime = null;
+let timerInterval = null;
+let eggZones = [];
+
+function drawEggs() {
+  // Draw actual small eggs on the image using a canvas overlay
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'absolute';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.pointerEvents = 'none';
+  canvas.style.zIndex = '5';
+  canvas.id = 'egg-canvas';
+  wrapper.appendChild(canvas);
+
+  function resizeCanvas() {
+    const rect = img.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    eggs.forEach((egg, i) => {
+      if (egg.found) return;
+      const ex = (egg.x / 100) * canvas.width;
+      const ey = (egg.y / 100) * canvas.height;
+      const size = Math.max(8, canvas.width * 0.012);
+
+      const rx = size * 0.7;
+      const ry = size;
+      ctx.save();
+      ctx.translate(ex, ey);
+
+      // Clip to egg shape
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.save();
+      ctx.clip();
+
+      // Base color
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = egg.color;
+      ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+
+      // Sheen gradient
+      const sheen = ctx.createRadialGradient(-rx * 0.3, -ry * 0.3, 0, 0, 0, ry);
+      sheen.addColorStop(0, 'rgba(255,255,255,0.35)');
+      sheen.addColorStop(1, 'rgba(0,0,0,0.1)');
+      ctx.fillStyle = sheen;
+      ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+
+      // Pattern decoration
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = egg.accent;
+      ctx.fillStyle = egg.accent;
+      ctx.lineWidth = Math.max(0.8, size * 0.08);
+
+      if (egg.pattern === 'zigzag') {
+        ctx.beginPath();
+        const step = rx * 0.35;
+        for (let y = -ry; y < ry; y += step) {
+          ctx.lineTo(y % (step * 2) === 0 ? -rx * 0.5 : rx * 0.5, y);
+        }
+        ctx.stroke();
+        // Second zigzag offset
+        ctx.beginPath();
+        for (let y = -ry + step / 2; y < ry; y += step) {
+          ctx.lineTo(y % (step * 2) === 0 ? rx * 0.3 : -rx * 0.3, y);
+        }
+        ctx.stroke();
+      }
+
+      if (egg.pattern === 'dots') {
+        const dotR = Math.max(1, size * 0.1);
+        const positions = [
+          [0, -ry * 0.5], [-rx * 0.35, -ry * 0.15], [rx * 0.35, -ry * 0.15],
+          [0, ry * 0.2], [-rx * 0.35, ry * 0.55], [rx * 0.35, ry * 0.55],
+          [0, ry * 0.7], [-rx * 0.2, -ry * 0.7], [rx * 0.2, ry * 0.1],
+        ];
+        positions.forEach(([dx, dy]) => {
+          ctx.beginPath();
+          ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      if (egg.pattern === 'stripes') {
+        const gap = ry * 0.3;
+        for (let y = -ry + gap; y < ry; y += gap) {
+          ctx.beginPath();
+          ctx.moveTo(-rx, y);
+          ctx.lineTo(rx, y);
+          ctx.stroke();
+        }
+      }
+
+      if (egg.pattern === 'stars') {
+        const drawStar = (cx, cy, r) => {
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+            const method = i === 0 ? 'moveTo' : 'lineTo';
+            ctx[method](cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+          }
+          ctx.closePath();
+          ctx.fill();
+        };
+        const starR = Math.max(1.5, size * 0.12);
+        drawStar(0, -ry * 0.45, starR);
+        drawStar(-rx * 0.25, ry * 0.15, starR * 0.8);
+        drawStar(rx * 0.25, ry * 0.5, starR);
+        drawStar(0, ry * 0.75, starR * 0.7);
+      }
+
+      if (egg.pattern === 'swirl') {
+        ctx.beginPath();
+        for (let a = 0; a < Math.PI * 4; a += 0.1) {
+          const r = a * size * 0.05;
+          ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
+        }
+        ctx.stroke();
+      }
+
+      ctx.restore(); // unclip
+
+      // Egg outline
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.lineWidth = Math.max(0.5, size * 0.06);
+      ctx.stroke();
+
+      ctx.restore();
+    });
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  img.addEventListener('load', resizeCanvas);
+
+  // Create click zones
+  eggs.forEach((egg, i) => {
+    const zone = document.createElement('div');
+    zone.className = 'egg-zone';
+    zone.dataset.index = i;
+    wrapper.appendChild(zone);
+    eggZones.push(zone);
+
+    function positionZone() {
+      const rect = img.getBoundingClientRect();
+      const wrapRect = wrapper.getBoundingClientRect();
+      const ex = (egg.x / 100) * rect.width;
+      const ey = (egg.y / 100) * rect.height;
+      const hitSize = Math.max(30, rect.width * 0.04);
+      zone.style.width = hitSize + 'px';
+      zone.style.height = hitSize + 'px';
+      zone.style.left = (ex - hitSize / 2) + 'px';
+      zone.style.top = (ey - hitSize / 2) + 'px';
+    }
+
+    positionZone();
+    window.addEventListener('resize', positionZone);
+    img.addEventListener('load', positionZone);
+
+    zone.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (egg.found) return;
+      if (!startTime) startTimer();
+
+      egg.found = true;
+      found++;
+      counterEl.textContent = `${found} / 5 eggs`;
+      zone.classList.add('found');
+
+      // Sparkle effect
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.textContent = '🥚✨';
+      sparkle.style.left = zone.style.left;
+      sparkle.style.top = zone.style.top;
+      wrapper.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 800);
+
+      // Redraw canvas without found egg
+      resizeCanvas();
+
+      if (found === 5) win();
+    });
+  });
+
+  // Miss click on image
+  wrapper.addEventListener('click', (e) => {
+    if (!startTime) startTimer();
+    const rect = wrapper.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const miss = document.createElement('div');
+    miss.className = 'miss-x';
+    miss.textContent = '✕';
+    miss.style.left = x + 'px';
+    miss.style.top = y + 'px';
+    wrapper.appendChild(miss);
+    setTimeout(() => miss.remove(), 600);
+  });
+}
+
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const min = Math.floor(elapsed / 60);
+    const sec = String(elapsed % 60).padStart(2, '0');
+    timerEl.textContent = `${min}:${sec}`;
+  }, 1000);
+}
+
+function win() {
+  clearInterval(timerInterval);
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = String(elapsed % 60).padStart(2, '0');
+  setTimeout(() => {
+    winTime.textContent = `You found all 5 eggs in ${min}:${sec}!`;
+    winOverlay.classList.add('show');
+  }, 500);
+}
+
+img.addEventListener('load', drawEggs);
+if (img.complete) drawEggs();
+</script>
+</body>
+</html>
