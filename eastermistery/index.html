@@ -48,11 +48,72 @@
   #egg-counter { color: #80e080; font-weight: 600; }
   #timer { color: #e0c060; font-weight: 600; }
 
+  /* Theme selection screen */
+  #theme-select {
+    position: absolute;
+    top: 48px; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    background: #0f0f1a;
+    z-index: 50;
+  }
+
+  #theme-select h2 {
+    font-size: 2rem;
+    color: #f0c040;
+  }
+
+  #theme-select p {
+    color: #888;
+    font-size: 1rem;
+  }
+
+  .theme-grid {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+
+  .theme-card {
+    cursor: pointer;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1a1a2e;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 280px;
+  }
+
+  .theme-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 30px rgba(240, 192, 64, 0.3);
+  }
+
+  .theme-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    display: block;
+  }
+
+  .theme-card .label {
+    padding: 0.8rem 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+
+  /* Game area */
   #game-container {
     position: absolute;
     top: 48px; left: 0; right: 0; bottom: 0;
     overflow: auto;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     background: #0a0a14;
@@ -72,8 +133,6 @@
 
   .egg-zone {
     position: absolute;
-    width: 30px;
-    height: 36px;
     cursor: pointer;
     border-radius: 50%;
     z-index: 10;
@@ -152,8 +211,13 @@
     color: #ccc;
   }
 
-  #win-overlay button {
+  .win-buttons {
+    display: flex;
+    gap: 1rem;
     margin-top: 1rem;
+  }
+
+  .win-buttons button {
     padding: 0.7rem 2rem;
     font-size: 1rem;
     background: #2a2a4d;
@@ -163,7 +227,7 @@
     cursor: pointer;
   }
 
-  #win-overlay button:hover { background: #3a3a6d; }
+  .win-buttons button:hover { background: #3a3a6d; }
 </style>
 </head>
 <body>
@@ -177,16 +241,46 @@
   </div>
 </div>
 
+<div id="theme-select">
+  <h2>Choose a theme</h2>
+  <p>Find 5 hidden Easter eggs in the scene</p>
+  <div class="theme-grid">
+    <div class="theme-card" onclick="startGame('castle')">
+      <img src="castle.png" alt="Castle">
+      <div class="label">Castle</div>
+    </div>
+    <div class="theme-card" onclick="startGame('antarctic')">
+      <img src="antarctic.png" alt="Antarctic">
+      <div class="label">Antarctic</div>
+    </div>
+    <div class="theme-card" onclick="startGame('equinor')">
+      <img src="equinor.png" alt="Equinor">
+      <div class="label">Equinor</div>
+    </div>
+    <div class="theme-card" onclick="startGame('gym')">
+      <img src="gym.png" alt="Gym">
+      <div class="label">Gym</div>
+    </div>
+    <div class="theme-card" onclick="startGame('boat')">
+      <img src="boat.png" alt="Boat">
+      <div class="label">Boat</div>
+    </div>
+  </div>
+</div>
+
 <div id="game-container">
   <div id="scene-wrapper">
-    <img id="scene-img" src="scene_1.png" alt="Find the eggs!" draggable="false">
+    <img id="scene-img" alt="Find the eggs!" draggable="false">
   </div>
 </div>
 
 <div id="win-overlay">
   <h2>You found all the eggs!</h2>
   <p id="win-time"></p>
-  <button onclick="location.reload()">Play Again</button>
+  <div class="win-buttons">
+    <button onclick="backToThemes()">Pick another theme</button>
+    <button onclick="location.reload()">Play Again</button>
+  </div>
 </div>
 
 <script>
@@ -196,24 +290,100 @@ const counterEl = document.getElementById('egg-counter');
 const timerEl = document.getElementById('timer');
 const winOverlay = document.getElementById('win-overlay');
 const winTime = document.getElementById('win-time');
+const themeSelect = document.getElementById('theme-select');
+const gameContainer = document.getElementById('game-container');
 
-// Egg positions as percentage of image dimensions
-// Placed in busy spots that are tricky to notice
-const eggs = [
-  { x: 12, y: 72, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },
-  { x: 73, y: 18, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },
-  { x: 45, y: 55, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },
-  { x: 88, y: 78, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },
-  { x: 28, y: 30, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },
-];
+const themes = {
+  castle: {
+    image: 'castle.png',
+    eggs: [
+      { x: 82, y: 86, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },     // behind barrels bottom-right
+      { x: 48, y: 60, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },     // at base of fountain
+      { x: 8, y: 56, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },   // behind market stall left
+      { x: 55, y: 16, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // in castle window
+      { x: 72, y: 78, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // next to cart wheel
+    ]
+  },
+  antarctic: {
+    image: 'antarctic.png',
+    eggs: [
+      { x: 12, y: 30, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },      // behind igloo left
+      { x: 45, y: 38, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },      // at research station base
+      { x: 72, y: 55, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },   // near wooden shelter
+      { x: 18, y: 58, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },     // by sled dog area
+      { x: 88, y: 20, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },     // near ship/crates
+    ]
+  },
+  equinor: {
+    image: 'equinor.png',
+    eggs: [
+      { x: 5, y: 93, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },       // behind plant bottom-left
+      { x: 50, y: 90, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },      // under table bottom-center
+      { x: 35, y: 30, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },   // on shelf near monitors
+      { x: 70, y: 68, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },     // between food items on table
+      { x: 42, y: 52, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },     // behind robot on floor
+    ]
+  },
+  gym: {
+    image: 'gym.png',
+    eggs: [
+      { x: 92, y: 88, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },     // behind dumbbells on floor bottom-right
+      { x: 8, y: 8, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },       // on juice bar counter top-left
+      { x: 75, y: 45, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },  // behind weight bench
+      { x: 30, y: 92, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // under yoga mat bottom area
+      { x: 58, y: 72, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // next to water cooler
+    ]
+  },
+  boat: {
+    image: 'boat.png',
+    eggs: [
+      { x: 8, y: 18, color: '#ff69b4', accent: '#fff', pattern: 'zigzag' },      // behind deck chair top-left
+      { x: 85, y: 52, color: '#40e0d0', accent: '#fff700', pattern: 'dots' },     // near shuffleboard sign
+      { x: 50, y: 85, color: '#ffd700', accent: '#e04040', pattern: 'stripes' },  // near life buoy lower deck
+      { x: 92, y: 90, color: '#9b59b6', accent: '#ffd700', pattern: 'stars' },    // by porthole bottom-right
+      { x: 30, y: 42, color: '#4d96ff', accent: '#ff69b4', pattern: 'swirl' },    // behind buffet table mid-left
+    ]
+  }
+};
 
+let eggs = [];
 let found = 0;
 let startTime = null;
 let timerInterval = null;
-let eggZones = [];
+let eggCanvas = null;
+let resizeHandler = null;
 
-function drawEggs() {
-  // Draw actual small eggs on the image using a canvas overlay
+function startGame(themeName) {
+  const theme = themes[themeName];
+  eggs = theme.eggs.map(e => ({ ...e, found: false }));
+  found = 0;
+  startTime = null;
+  clearInterval(timerInterval);
+  counterEl.textContent = '0 / 5 eggs';
+  timerEl.textContent = '0:00';
+
+  themeSelect.style.display = 'none';
+  gameContainer.style.display = 'flex';
+  winOverlay.classList.remove('show');
+
+  // Clean up previous game
+  wrapper.querySelectorAll('.egg-zone, .miss-x, .sparkle').forEach(el => el.remove());
+  if (eggCanvas) { eggCanvas.remove(); eggCanvas = null; }
+  if (resizeHandler) window.removeEventListener('resize', resizeHandler);
+
+  img.src = theme.image;
+  if (img.complete) setupScene();
+  else img.onload = setupScene;
+}
+
+function backToThemes() {
+  clearInterval(timerInterval);
+  gameContainer.style.display = 'none';
+  winOverlay.classList.remove('show');
+  themeSelect.style.display = 'flex';
+}
+
+function setupScene() {
   const canvas = document.createElement('canvas');
   canvas.style.position = 'absolute';
   canvas.style.top = '0';
@@ -222,7 +392,7 @@ function drawEggs() {
   canvas.style.height = '100%';
   canvas.style.pointerEvents = 'none';
   canvas.style.zIndex = '5';
-  canvas.id = 'egg-canvas';
+  eggCanvas = canvas;
   wrapper.appendChild(canvas);
 
   function resizeCanvas() {
@@ -232,148 +402,37 @@ function drawEggs() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    eggs.forEach((egg, i) => {
+    eggs.forEach((egg) => {
       if (egg.found) return;
       const ex = (egg.x / 100) * canvas.width;
       const ey = (egg.y / 100) * canvas.height;
       const size = Math.max(8, canvas.width * 0.012);
-
-      const rx = size * 0.7;
-      const ry = size;
-      ctx.save();
-      ctx.translate(ex, ey);
-
-      // Clip to egg shape
-      ctx.beginPath();
-      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-      ctx.save();
-      ctx.clip();
-
-      // Base color
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = egg.color;
-      ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
-
-      // Sheen gradient
-      const sheen = ctx.createRadialGradient(-rx * 0.3, -ry * 0.3, 0, 0, 0, ry);
-      sheen.addColorStop(0, 'rgba(255,255,255,0.35)');
-      sheen.addColorStop(1, 'rgba(0,0,0,0.1)');
-      ctx.fillStyle = sheen;
-      ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
-
-      // Pattern decoration
-      ctx.globalAlpha = 0.8;
-      ctx.strokeStyle = egg.accent;
-      ctx.fillStyle = egg.accent;
-      ctx.lineWidth = Math.max(0.8, size * 0.08);
-
-      if (egg.pattern === 'zigzag') {
-        ctx.beginPath();
-        const step = rx * 0.35;
-        for (let y = -ry; y < ry; y += step) {
-          ctx.lineTo(y % (step * 2) === 0 ? -rx * 0.5 : rx * 0.5, y);
-        }
-        ctx.stroke();
-        // Second zigzag offset
-        ctx.beginPath();
-        for (let y = -ry + step / 2; y < ry; y += step) {
-          ctx.lineTo(y % (step * 2) === 0 ? rx * 0.3 : -rx * 0.3, y);
-        }
-        ctx.stroke();
-      }
-
-      if (egg.pattern === 'dots') {
-        const dotR = Math.max(1, size * 0.1);
-        const positions = [
-          [0, -ry * 0.5], [-rx * 0.35, -ry * 0.15], [rx * 0.35, -ry * 0.15],
-          [0, ry * 0.2], [-rx * 0.35, ry * 0.55], [rx * 0.35, ry * 0.55],
-          [0, ry * 0.7], [-rx * 0.2, -ry * 0.7], [rx * 0.2, ry * 0.1],
-        ];
-        positions.forEach(([dx, dy]) => {
-          ctx.beginPath();
-          ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
-          ctx.fill();
-        });
-      }
-
-      if (egg.pattern === 'stripes') {
-        const gap = ry * 0.3;
-        for (let y = -ry + gap; y < ry; y += gap) {
-          ctx.beginPath();
-          ctx.moveTo(-rx, y);
-          ctx.lineTo(rx, y);
-          ctx.stroke();
-        }
-      }
-
-      if (egg.pattern === 'stars') {
-        const drawStar = (cx, cy, r) => {
-          ctx.beginPath();
-          for (let i = 0; i < 5; i++) {
-            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-            const method = i === 0 ? 'moveTo' : 'lineTo';
-            ctx[method](cx + r * Math.cos(angle), cy + r * Math.sin(angle));
-          }
-          ctx.closePath();
-          ctx.fill();
-        };
-        const starR = Math.max(1.5, size * 0.12);
-        drawStar(0, -ry * 0.45, starR);
-        drawStar(-rx * 0.25, ry * 0.15, starR * 0.8);
-        drawStar(rx * 0.25, ry * 0.5, starR);
-        drawStar(0, ry * 0.75, starR * 0.7);
-      }
-
-      if (egg.pattern === 'swirl') {
-        ctx.beginPath();
-        for (let a = 0; a < Math.PI * 4; a += 0.1) {
-          const r = a * size * 0.05;
-          ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
-        }
-        ctx.stroke();
-      }
-
-      ctx.restore(); // unclip
-
-      // Egg outline
-      ctx.globalAlpha = 0.9;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
-      ctx.lineWidth = Math.max(0.5, size * 0.06);
-      ctx.stroke();
-
-      ctx.restore();
+      drawDecoratedEgg(ctx, ex, ey, size, egg);
     });
-  }
 
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-  img.addEventListener('load', resizeCanvas);
-
-  // Create click zones
-  eggs.forEach((egg, i) => {
-    const zone = document.createElement('div');
-    zone.className = 'egg-zone';
-    zone.dataset.index = i;
-    wrapper.appendChild(zone);
-    eggZones.push(zone);
-
-    function positionZone() {
-      const rect = img.getBoundingClientRect();
-      const wrapRect = wrapper.getBoundingClientRect();
+    // Reposition egg zones
+    eggZones.forEach((zone, i) => {
+      const egg = eggs[i];
+      const hitSize = Math.max(30, rect.width * 0.04);
       const ex = (egg.x / 100) * rect.width;
       const ey = (egg.y / 100) * rect.height;
-      const hitSize = Math.max(30, rect.width * 0.04);
       zone.style.width = hitSize + 'px';
       zone.style.height = hitSize + 'px';
       zone.style.left = (ex - hitSize / 2) + 'px';
       zone.style.top = (ey - hitSize / 2) + 'px';
-    }
+    });
+  }
 
-    positionZone();
-    window.addEventListener('resize', positionZone);
-    img.addEventListener('load', positionZone);
+  resizeHandler = resizeCanvas;
+  window.addEventListener('resize', resizeCanvas);
+
+  // Create click zones
+  const eggZones = [];
+  eggs.forEach((egg, i) => {
+    const zone = document.createElement('div');
+    zone.className = 'egg-zone';
+    wrapper.appendChild(zone);
+    eggZones.push(zone);
 
     zone.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -385,7 +444,6 @@ function drawEggs() {
       counterEl.textContent = `${found} / 5 eggs`;
       zone.classList.add('found');
 
-      // Sparkle effect
       const sparkle = document.createElement('div');
       sparkle.className = 'sparkle';
       sparkle.textContent = '🥚✨';
@@ -394,20 +452,17 @@ function drawEggs() {
       wrapper.appendChild(sparkle);
       setTimeout(() => sparkle.remove(), 800);
 
-      // Redraw canvas without found egg
       resizeCanvas();
-
       if (found === 5) win();
     });
   });
 
-  // Miss click on image
-  wrapper.addEventListener('click', (e) => {
+  // Miss click
+  wrapper.onclick = (e) => {
     if (!startTime) startTimer();
     const rect = wrapper.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-
     const miss = document.createElement('div');
     miss.className = 'miss-x';
     miss.textContent = '✕';
@@ -415,7 +470,112 @@ function drawEggs() {
     miss.style.top = y + 'px';
     wrapper.appendChild(miss);
     setTimeout(() => miss.remove(), 600);
-  });
+  };
+
+  resizeCanvas();
+}
+
+function drawDecoratedEgg(ctx, ex, ey, size, egg) {
+  const rx = size * 0.7;
+  const ry = size;
+  ctx.save();
+  ctx.translate(ex, ey);
+
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+  ctx.save();
+  ctx.clip();
+
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = egg.color;
+  ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+
+  const sheen = ctx.createRadialGradient(-rx * 0.3, -ry * 0.3, 0, 0, 0, ry);
+  sheen.addColorStop(0, 'rgba(255,255,255,0.35)');
+  sheen.addColorStop(1, 'rgba(0,0,0,0.1)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+
+  ctx.globalAlpha = 0.8;
+  ctx.strokeStyle = egg.accent;
+  ctx.fillStyle = egg.accent;
+  ctx.lineWidth = Math.max(0.8, size * 0.08);
+
+  if (egg.pattern === 'zigzag') {
+    ctx.beginPath();
+    const step = rx * 0.35;
+    for (let y = -ry; y < ry; y += step) {
+      ctx.lineTo(y % (step * 2) === 0 ? -rx * 0.5 : rx * 0.5, y);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    for (let y = -ry + step / 2; y < ry; y += step) {
+      ctx.lineTo(y % (step * 2) === 0 ? rx * 0.3 : -rx * 0.3, y);
+    }
+    ctx.stroke();
+  }
+
+  if (egg.pattern === 'dots') {
+    const dotR = Math.max(1, size * 0.1);
+    const positions = [
+      [0, -ry * 0.5], [-rx * 0.35, -ry * 0.15], [rx * 0.35, -ry * 0.15],
+      [0, ry * 0.2], [-rx * 0.35, ry * 0.55], [rx * 0.35, ry * 0.55],
+      [0, ry * 0.7], [-rx * 0.2, -ry * 0.7], [rx * 0.2, ry * 0.1],
+    ];
+    positions.forEach(([dx, dy]) => {
+      ctx.beginPath();
+      ctx.arc(dx, dy, dotR, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  if (egg.pattern === 'stripes') {
+    const gap = ry * 0.3;
+    for (let y = -ry + gap; y < ry; y += gap) {
+      ctx.beginPath();
+      ctx.moveTo(-rx, y);
+      ctx.lineTo(rx, y);
+      ctx.stroke();
+    }
+  }
+
+  if (egg.pattern === 'stars') {
+    const drawStar = (cx, cy, r) => {
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+        const method = i === 0 ? 'moveTo' : 'lineTo';
+        ctx[method](cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+      }
+      ctx.closePath();
+      ctx.fill();
+    };
+    const starR = Math.max(1.5, size * 0.12);
+    drawStar(0, -ry * 0.45, starR);
+    drawStar(-rx * 0.25, ry * 0.15, starR * 0.8);
+    drawStar(rx * 0.25, ry * 0.5, starR);
+    drawStar(0, ry * 0.75, starR * 0.7);
+  }
+
+  if (egg.pattern === 'swirl') {
+    ctx.beginPath();
+    for (let a = 0; a < Math.PI * 4; a += 0.1) {
+      const r = a * size * 0.05;
+      ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
+    }
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  ctx.globalAlpha = 0.9;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = Math.max(0.5, size * 0.06);
+  ctx.stroke();
+
+  ctx.restore();
 }
 
 function startTimer() {
@@ -438,9 +598,6 @@ function win() {
     winOverlay.classList.add('show');
   }, 500);
 }
-
-img.addEventListener('load', drawEggs);
-if (img.complete) drawEggs();
 </script>
 </body>
 </html>
