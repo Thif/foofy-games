@@ -17,6 +17,36 @@ const games = [
     description: "Pop the balloons!",
     folder: "shootballoon"
   },
+  {
+    name: "Space Invaders",
+    description: "Defend Earth from alien waves",
+    folder: "space-invaders"
+  },
+  {
+    name: "Tetris",
+    description: "Stack and clear falling blocks",
+    folder: "tetris"
+  },
+  {
+    name: "Pong",
+    description: "Classic paddle ball vs AI",
+    folder: "pong"
+  },
+  {
+    name: "Breakout",
+    description: "Smash bricks with a bouncing ball",
+    folder: "breakout"
+  },
+  {
+    name: "Flappy Bird",
+    description: "Tap to fly through the pipes",
+    folder: "flappy-bird"
+  },
+  {
+    name: "Minesweeper",
+    description: "Find all mines without clicking one",
+    folder: "minesweeper"
+  },
 ];
 
 function renderGames() {
@@ -35,7 +65,8 @@ function renderGames() {
     .map(
       (game) => `
     <a class="game-card" href="/${game.folder}/">
-      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}">
+      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="thumbnail placeholder" style="display:none">${game.name[0]}</div>
       <div class="info">
         <h2>${game.name}</h2>
         <p>${game.description}</p>
