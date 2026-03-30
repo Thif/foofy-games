@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShootBalloon 🎮</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- animated background canvas (menu only) -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- ════════════════════════════════════════
+       MAIN MENU
+  ════════════════════════════════════════ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-card">
+      <h1 class="title">🎈 Sh<span class="oo-eyes">👀</span>tBall<span class="oo-eyes">👀</span>n 🎈</h1>
+      <p class="subtitle">Aim · Charge · Shoot · First to land 10 hits wins</p>
+
+      <div class="mode-buttons">
+        <button class="btn btn-1p" id="btn-1p">
+          <span class="btn-icon">🧑‍💻</span>
+          <span class="btn-label">1 Player</span>
+          <span class="btn-desc">You vs the AI</span>
+        </button>
+        <button class="btn btn-2p" id="btn-2p">
+          <span class="btn-icon">👥</span>
+          <span class="btn-label">2 Players</span>
+          <span class="btn-desc">Local battle</span>
+        </button>
+      </div>
+      <p class="credits">Created by Julia Forest</p>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       CHARACTER SELECT SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-diff" class="screen">
+    <div class="menu-card">
+      <h2 class="char-title">Choose AI Difficulty</h2>
+      <p class="char-step">How tough do you want the opponent?</p>
+      <div class="diff-buttons">
+        <button class="btn diff-btn" id="btn-diff-easy">
+          <span class="btn-icon">🌱</span>
+          <span class="btn-label">Easy</span>
+          <span class="btn-desc">Slow reactions, wild aim</span>
+        </button>
+        <button class="btn diff-btn selected" id="btn-diff-medium">
+          <span class="btn-icon">⚔️</span>
+          <span class="btn-label">Medium</span>
+          <span class="btn-desc">Balanced challenge</span>
+        </button>
+        <button class="btn diff-btn" id="btn-diff-hard">
+          <span class="btn-icon">💀</span>
+          <span class="btn-label">Hard</span>
+          <span class="btn-desc">Near-perfect aim, fast</span>
+        </button>
+      </div>
+      <div style="display:flex;gap:.8rem;margin-top:1.2rem;">
+        <button class="btn btn-menu-back" id="btn-diff-back">← Back</button>
+        <button class="btn btn-play" id="btn-diff-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       CHARACTER SELECT SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-chars" class="screen">
+    <div class="menu-card char-card">
+      <h2 class="char-title" id="char-title">Choose your character</h2>
+      <p class="char-step" id="char-step"></p>
+
+      <div class="char-grid" id="char-grid"></div>
+
+      <div class="char-selected-row" id="char-selected-row"></div>
+
+      <div class="char-nav">
+        <button class="btn btn-menu-back" id="btn-char-back">← Back</button>
+        <button class="btn btn-play" id="btn-char-next" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       WORLD SELECT SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-world" class="screen">
+    <div class="menu-card char-card">
+      <h2 class="char-title">Choose your World</h2>
+      <p class="char-step">Where does the battle take place?</p>
+      <div class="world-grid" id="world-grid"></div>
+      <div class="char-nav" style="margin-top:.8rem;">
+        <button class="btn btn-menu-back" id="btn-world-back">← Back</button>
+        <button class="btn btn-play" id="btn-world-next" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       CANNON SELECT SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-cannon" class="screen">
+    <div class="menu-card char-card">
+      <h2 class="char-title">Choose your Cannon</h2>
+      <p class="char-step" id="cannon-step"></p>
+      <div class="cannon-grid" id="cannon-grid"></div>
+      <div class="char-nav" style="margin-top:.8rem;">
+        <button class="btn btn-menu-back" id="btn-cannon-back">← Back</button>
+        <button class="btn btn-play" id="btn-cannon-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       CONTROLS / PLAY SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-controls" class="screen">
+    <div class="menu-card">
+      <div class="chosen-characters" id="chosen-characters"></div>
+      <div id="controls-info" class="controls-info">
+        <h3>🕹 Controls</h3>
+        <div id="controls-body"></div>
+      </div>
+      <div style="display:flex;gap:.8rem;margin-top:1rem;">
+        <button class="btn btn-menu-back" id="btn-ctrl-back">← Back</button>
+        <button class="btn btn-play" id="btn-play">▶ Play!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       GAME SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+    <div class="hud">
+      <div class="hud-player">
+        <span class="hud-name" id="name-left">Player 1</span>
+        <span class="hud-hearts" id="hearts-left"></span>
+      </div>
+      <button class="btn-pause" id="btn-pause" title="Pause">⏸</button>
+      <div class="hud-player hud-right">
+        <span class="hud-hearts" id="hearts-right"></span>
+        <span class="hud-name" id="name-right">Player 2</span>
+      </div>
+    </div>
+
+    <div class="game-row">
+      <!-- Left sidebar -->
+      <div class="side-panel side-panel-left" id="side-panel-left">
+        <div class="sp-section">
+          <div class="sp-emoji" id="sp-emoji-left">🧑</div>
+          <div class="sp-charname" id="sp-charname-left">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-section">
+          <div class="sp-label">Cannon</div>
+          <div class="sp-value" id="sp-cannon-left">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-section">
+          <div class="sp-label">❤️ HP</div>
+          <div class="sp-hp" id="sp-hp-left">10</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">🎯 Shots</div>
+          <div class="sp-value" id="sp-shots-left">0</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">💥 Hits</div>
+          <div class="sp-value" id="sp-hits-left">0</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">⭐ MegaBall</div>
+          <div class="sp-value sp-mega" id="sp-mega-left">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-controls">
+          <div class="sp-label">Controls</div>
+          <div class="sp-ctrl-row"><kbd>A</kbd><kbd>D</kbd> Move</div>
+          <div class="sp-ctrl-row"><kbd>W</kbd><kbd>S</kbd> Aim</div>
+          <div class="sp-ctrl-row"><kbd>T</kbd> Throw</div>
+        </div>
+      </div>
+
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Right sidebar -->
+      <div class="side-panel side-panel-right" id="side-panel-right">
+        <div class="sp-section">
+          <div class="sp-emoji" id="sp-emoji-right">🤖</div>
+          <div class="sp-charname" id="sp-charname-right">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-section">
+          <div class="sp-label">Cannon</div>
+          <div class="sp-value" id="sp-cannon-right">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-section">
+          <div class="sp-label">❤️ HP</div>
+          <div class="sp-hp" id="sp-hp-right">10</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">🎯 Shots</div>
+          <div class="sp-value" id="sp-shots-right">0</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">💥 Hits</div>
+          <div class="sp-value" id="sp-hits-right">0</div>
+        </div>
+        <div class="sp-section">
+          <div class="sp-label">⭐ MegaBall</div>
+          <div class="sp-value sp-mega" id="sp-mega-right">—</div>
+        </div>
+        <div class="sp-divider"></div>
+        <div class="sp-controls">
+          <div class="sp-label">Controls</div>
+          <div class="sp-ctrl-row" id="sp-ctrl-right-1"><kbd>←</kbd><kbd>→</kbd> Move</div>
+          <div class="sp-ctrl-row" id="sp-ctrl-right-2"><kbd>↑</kbd><kbd>↓</kbd> Aim</div>
+          <div class="sp-ctrl-row" id="sp-ctrl-right-3"><kbd>M</kbd> Hold→Throw</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="pause-overlay" class="overlay hidden">
+      <div class="overlay-card">
+        <h2>Paused ⏸</h2>
+        <button class="btn btn-resume" id="btn-resume">▶ Resume</button>
+        <button class="btn btn-menu-back" id="btn-menu-back-pause">🏠 Main Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       GAME OVER SCREEN
+  ════════════════════════════════════════ -->
+  <div id="screen-gameover" class="screen">
+    <div class="overlay-card">
+      <h2 id="winner-text">🏆 Player 1 Wins!</h2>
+      <p id="final-score"></p>
+      <button class="btn btn-play" id="btn-rematch">🔄 Rematch</button>
+      <button class="btn btn-menu-back" id="btn-menu-back-go">🏠 Main Menu</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+
+  <!-- ════ Animated menu background ════ -->
+  <script>
+  (function () {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      // Re-spread balloons across new width
+      for (const b of balloons) {
+        if (b.x > canvas.width + 80) b.x = Math.random() * canvas.width;
+      }
+    }
+    window.addEventListener('resize', resize);
+
+    /* ── Sky gradient colours ── */
+    const SKY_TOP    = '#4fc3f7';
+    const SKY_BOTTOM = '#b3e5fc';
+
+    /* ── Clouds ── */
+    const clouds = [];
+    function makeCloud(forceLeft) {
+      const W = canvas.width || window.innerWidth;
+      const H = canvas.height || window.innerHeight;
+      return {
+        x:     forceLeft ? -180 : Math.random() * W,
+        y:     20 + Math.random() * H * 0.32,
+        scale: 0.6 + Math.random() * 1.2,
+        speed: 0.3 + Math.random() * 0.5,
+        alpha: 0.55 + Math.random() * 0.35,
+      };
+    }
+    function initClouds() {
+      clouds.length = 0;
+      for (let i = 0; i < 9; i++) clouds.push(makeCloud(false));
+    }
+
+    function drawCloud(c) {
+      ctx.save();
+      ctx.globalAlpha = c.alpha;
+      ctx.fillStyle   = '#fff';
+      const cx = c.x, cy = c.y, s = c.scale * 30;
+      [[0,0,s],[s*.85,s*-.25,s*.82],[s*1.7,s*.05,s*.9],[s*2.5,s*-.1,s*.75]].forEach(([dx,dy,r]) => {
+        ctx.beginPath();
+        ctx.arc(cx + dx, cy + dy, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    /* ── Water balloons ── */
+    const COLORS = [
+      ['#60b8f5','#1d6fa4'],
+      ['#f87171','#b91c1c'],
+      ['#4ade80','#15803d'],
+      ['#facc15','#a16207'],
+      ['#c084fc','#7e22ce'],
+      ['#fb923c','#c2410c'],
+    ];
+
+    const balloons = [];
+    function makeBalloon(fromTop) {
+      const W = canvas.width || window.innerWidth;
+      const H = canvas.height || window.innerHeight;
+      const col = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return {
+        x:         Math.random() * (W + 60) - 30,
+        y:         fromTop ? (-40 - Math.random() * H * 0.5) : (Math.random() * H),
+        vy:        1.8 + Math.random() * 2.2,
+        vx:        (Math.random() - 0.5) * 1.2,
+        wobble:    Math.random() * Math.PI * 2,
+        wSpeed:    0.04 + Math.random() * 0.04,
+        r:         14 + Math.random() * 10,
+        col,
+        spin:      (Math.random() - 0.5) * 0.05,
+        angle:     Math.random() * Math.PI * 2,
+        splatting: false,
+        splatFrame:0,
+        splatX:    0,
+        splatY:    0,
+        splatCol:  col,
+      };
+    }
+    function initBalloons() {
+      balloons.length = 0;
+      for (let i = 0; i < 18; i++) balloons.push(makeBalloon(false));
+    }
+
+    function drawBalloon(b) {
+      const wx = Math.sin(b.wobble) * 3;
+      ctx.save();
+      ctx.translate(b.x + wx, b.y);
+      ctx.rotate(b.angle);
+      const g = ctx.createRadialGradient(-b.r * 0.3, -b.r * 0.3, 1, 0, 0, b.r);
+      g.addColorStop(0, '#ffffffcc');
+      g.addColorStop(0.35, b.col[0]);
+      g.addColorStop(1,    b.col[1]);
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, b.r * 0.88, b.r, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = b.col[1];
+      ctx.beginPath();
+      ctx.ellipse(0, b.r + 3, 4, 5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#00000044'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, b.r + 5);
+      ctx.bezierCurveTo(6, b.r + 20, -6, b.r + 30, 2, b.r + 42);
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff66';
+      ctx.beginPath();
+      ctx.ellipse(-b.r * 0.28, -b.r * 0.28, b.r * 0.22, b.r * 0.14, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawSplat(b) {
+      const p = Math.min(b.splatFrame / 18, 1);
+      const inv = 1 - p;
+      ctx.save();
+      ctx.globalAlpha = inv;
+      ctx.fillStyle   = b.splatCol[0];
+      for (let i = 0; i < 8; i++) {
+        const ang  = (i / 8) * Math.PI * 2;
+        const dist = p * 55;
+        const dr   = (4 + (i % 3) * 3) * inv;
+        ctx.beginPath();
+        ctx.arc(b.splatX + Math.cos(ang) * dist, b.splatY + Math.sin(ang) * dist, dr, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.fillStyle = b.splatCol[1] + '88';
+      ctx.beginPath();
+      ctx.ellipse(b.splatX, b.splatY, 28 * p + 4, 10 * p + 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    /* ── Emojis floating up ── */
+    const FLOATER_LIST = ['💧','🎈','💦','🌊','😂','🎯','💥','🌀'];
+    const floaters = [];
+    function makeFloater(fromBottom) {
+      const W = canvas.width || window.innerWidth;
+      const H = canvas.height || window.innerHeight;
+      return {
+        emoji: FLOATER_LIST[Math.floor(Math.random() * FLOATER_LIST.length)],
+        x:     Math.random() * W,
+        y:     fromBottom ? H + 20 : Math.random() * H,
+        vy:    -(0.5 + Math.random() * 0.8),
+        size:  18 + Math.random() * 18,
+        alpha: 0.35 + Math.random() * 0.4,
+        drift: (Math.random() - 0.5) * 0.5,
+      };
+    }
+    function initFloaters() {
+      floaters.length = 0;
+      for (let i = 0; i < 10; i++) floaters.push(makeFloater(false));
+    }
+
+    /* ── Initialise everything ── */
+    resize();
+    initClouds();
+    initBalloons();
+    initFloaters();
+
+    /* ── Tick: runs on setInterval so it NEVER pauses ── */
+    function tick() {
+      const W = canvas.width;
+      const H = canvas.height;
+
+      // sky
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, SKY_TOP);
+      sky.addColorStop(1, SKY_BOTTOM);
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, W, H);
+
+      // clouds
+      for (const c of clouds) {
+        drawCloud(c);
+        c.x += c.speed;
+        if (c.x > W + 160) {
+          c.x     = -180;
+          c.y     = 20 + Math.random() * H * 0.32;
+          c.scale = 0.6 + Math.random() * 1.2;
+          c.speed = 0.3 + Math.random() * 0.5;
+        }
+      }
+
+      // floaters
+      ctx.textAlign = 'center';
+      for (let i = 0; i < floaters.length; i++) {
+        const f = floaters[i];
+        ctx.save();
+        ctx.globalAlpha = f.alpha;
+        ctx.font = `${f.size}px serif`;
+        ctx.fillText(f.emoji, f.x, f.y);
+        ctx.restore();
+        f.y += f.vy;
+        f.x += f.drift;
+        if (f.y < -40) {
+          floaters[i] = makeFloater(true);
+        }
+      }
+
+      // balloons
+      for (let i = 0; i < balloons.length; i++) {
+        const b = balloons[i];
+
+        if (b.splatting) {
+          drawSplat(b);
+          b.splatFrame++;
+          if (b.splatFrame > 22) {
+            balloons[i] = makeBalloon(true);
+          }
+          continue;
+        }
+
+        drawBalloon(b);
+        b.y      += b.vy;
+        b.x      += b.vx;
+        b.wobble += b.wSpeed;
+        b.angle  += b.spin;
+
+        if (b.y - b.r > H + 10) {
+          b.splatting   = true;
+          b.splatFrame  = 0;
+          b.splatX      = b.x;
+          b.splatY      = H - 5;
+        }
+        if (b.x < -80)  b.x = W + 60;
+        if (b.x > W+80) b.x = -60;
+      }
+    }
+
+    // Run at ~60 fps with setInterval — never paused by tab visibility
+    setInterval(tick, 16);
+  })();
+  </script>
+</body>
+</html>
