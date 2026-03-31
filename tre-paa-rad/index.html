@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tre på rad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        a.back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #8888cc;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+
+        a.back-link:hover {
+            color: #aaaaff;
+        }
+
+        h1 {
+            margin-top: 40px;
+            font-size: 2.4rem;
+            color: #ffffff;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .scoreboard {
+            display: flex;
+            gap: 32px;
+            margin: 20px 0 10px;
+            font-size: 1.05rem;
+        }
+
+        .scoreboard span {
+            padding: 6px 16px;
+            border-radius: 8px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a4a;
+        }
+
+        .scoreboard .label {
+            color: #888;
+            margin-right: 4px;
+        }
+
+        .scoreboard .wins { color: #4caf50; }
+        .scoreboard .losses { color: #f44336; }
+        .scoreboard .draws { color: #ff9800; }
+
+        #status {
+            margin: 16px 0;
+            font-size: 1.3rem;
+            min-height: 36px;
+            color: #ccccee;
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 300px;
+            height: 300px;
+            background: #2a2a4a;
+            border-radius: 12px;
+            padding: 6px;
+        }
+
+        .cell {
+            background: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.1s;
+            user-select: none;
+        }
+
+        .cell:hover:not(.taken) {
+            background: #252540;
+            transform: scale(1.04);
+        }
+
+        .cell.taken {
+            cursor: default;
+        }
+
+        .cell.x {
+            color: #6ec6ff;
+        }
+
+        .cell.o {
+            color: #ff6e8a;
+        }
+
+        .cell.win {
+            background: #2e4a2e;
+            animation: pulse 0.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { background: #2e4a2e; }
+            to { background: #3a6a3a; }
+        }
+
+        #restart {
+            margin-top: 24px;
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            background: #3a3a6a;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #restart:hover {
+            background: #5050a0;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">&#8592; Tilbake til spill</a>
+    <h1>Tre på rad</h1>
+
+    <div class="scoreboard">
+        <span><span class="label">Seire:</span> <span class="wins" id="wins">0</span></span>
+        <span><span class="label">Tap:</span> <span class="losses" id="losses">0</span></span>
+        <span><span class="label">Uavgjort:</span> <span class="draws" id="draws">0</span></span>
+    </div>
+
+    <div id="status">Din tur</div>
+
+    <div class="board" id="board"></div>
+
+    <button id="restart">Spill igjen</button>
+
+    <script src="/achievements.js"></script>
+    <script>
+        (function () {
+            if (typeof reportEvent === 'function') reportEvent('game_played', 'tre-paa-rad');
+
+            const HUMAN = 'X';
+            const AI = 'O';
+            const EMPTY = '';
+
+            const winPatterns = [
+                [0,1,2],[3,4,5],[6,7,8],
+                [0,3,6],[1,4,7],[2,5,8],
+                [0,4,8],[2,4,6]
+            ];
+
+            let board = Array(9).fill(EMPTY);
+            let gameOver = false;
+            let scores = { wins: 0, losses: 0, draws: 0 };
+
+            const boardEl = document.getElementById('board');
+            const statusEl = document.getElementById('status');
+            const restartBtn = document.getElementById('restart');
+
+            function createBoard() {
+                boardEl.innerHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('button');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', handleClick);
+                    boardEl.appendChild(cell);
+                }
+            }
+
+            function render() {
+                const cells = boardEl.querySelectorAll('.cell');
+                cells.forEach((cell, i) => {
+                    cell.textContent = board[i];
+                    cell.classList.remove('x', 'o', 'taken', 'win');
+                    if (board[i] === HUMAN) { cell.classList.add('x', 'taken'); }
+                    else if (board[i] === AI) { cell.classList.add('o', 'taken'); }
+                });
+                document.getElementById('wins').textContent = scores.wins;
+                document.getElementById('losses').textContent = scores.losses;
+                document.getElementById('draws').textContent = scores.draws;
+            }
+
+            function checkWinner(b) {
+                for (const p of winPatterns) {
+                    if (b[p[0]] && b[p[0]] === b[p[1]] && b[p[1]] === b[p[2]]) {
+                        return { winner: b[p[0]], line: p };
+                    }
+                }
+                return null;
+            }
+
+            function isFull(b) {
+                return b.every(c => c !== EMPTY);
+            }
+
+            function highlightWin(line) {
+                const cells = boardEl.querySelectorAll('.cell');
+                line.forEach(i => cells[i].classList.add('win'));
+            }
+
+            function minimax(b, isMax, alpha, beta) {
+                const result = checkWinner(b);
+                if (result) return result.winner === AI ? 10 : -10;
+                if (isFull(b)) return 0;
+
+                if (isMax) {
+                    let best = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (b[i] === EMPTY) {
+                            b[i] = AI;
+                            best = Math.max(best, minimax(b, false, alpha, beta));
+                            b[i] = EMPTY;
+                            alpha = Math.max(alpha, best);
+                            if (beta <= alpha) break;
+                        }
+                    }
+                    return best;
+                } else {
+                    let best = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (b[i] === EMPTY) {
+                            b[i] = HUMAN;
+                            best = Math.min(best, minimax(b, true, alpha, beta));
+                            b[i] = EMPTY;
+                            beta = Math.min(beta, best);
+                            if (beta <= alpha) break;
+                        }
+                    }
+                    return best;
+                }
+            }
+
+            function bestMove() {
+                let best = -Infinity;
+                let move = -1;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === EMPTY) {
+                        board[i] = AI;
+                        const score = minimax(board, false, -Infinity, Infinity);
+                        board[i] = EMPTY;
+                        if (score > best) {
+                            best = score;
+                            move = i;
+                        }
+                    }
+                }
+                return move;
+            }
+
+            function endGame(msg) {
+                gameOver = true;
+                statusEl.textContent = msg;
+            }
+
+            function aiTurn() {
+                statusEl.textContent = 'AI tenker...';
+                setTimeout(() => {
+                    const move = bestMove();
+                    if (move === -1) return;
+                    board[move] = AI;
+                    render();
+
+                    const result = checkWinner(board);
+                    if (result) {
+                        highlightWin(result.line);
+                        scores.losses++;
+                        render();
+                        endGame('AI vant!');
+                        return;
+                    }
+                    if (isFull(board)) {
+                        scores.draws++;
+                        render();
+                        endGame('Uavgjort!');
+                        return;
+                    }
+                    statusEl.textContent = 'Din tur';
+                }, 300);
+            }
+
+            function handleClick(e) {
+                if (gameOver) return;
+                const i = parseInt(e.target.dataset.index);
+                if (board[i] !== EMPTY) return;
+
+                board[i] = HUMAN;
+                render();
+
+                const result = checkWinner(board);
+                if (result) {
+                    highlightWin(result.line);
+                    scores.wins++;
+                    render();
+                    endGame('Du vant!');
+                    return;
+                }
+                if (isFull(board)) {
+                    scores.draws++;
+                    render();
+                    endGame('Uavgjort!');
+                    return;
+                }
+
+                aiTurn();
+            }
+
+            function resetGame() {
+                board = Array(9).fill(EMPTY);
+                gameOver = false;
+                statusEl.textContent = 'Din tur';
+                createBoard();
+                render();
+            }
+
+            restartBtn.addEventListener('click', resetGame);
+
+            createBoard();
+            render();
+        })();
+    </script>
+</body>
+</html>

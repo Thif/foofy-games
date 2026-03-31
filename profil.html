@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Min profil — Spillverksted</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0f0f1a;
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    a { color: #7eb8ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back-link { font-size: 0.95rem; display: inline-block; margin-bottom: 1.5rem; }
+    .back-link::before { content: "\2190 "; }
+
+    .profile-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .avatar {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin: 0 auto 1rem;
+    }
+    .profile-name {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffd93d;
+    }
+    .profile-subtitle {
+      color: #888;
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+    }
+    .edit-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #888;
+      cursor: pointer;
+      border: 1px solid #333;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+    }
+    .edit-link:hover { color: #ffd93d; border-color: #ffd93d; text-decoration: none; }
+
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .stat-card {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffd93d;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .games-stats {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .game-stat-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: #1a1a2e;
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .game-stat-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .game-stat-name { flex: 1; font-weight: 600; font-size: 0.95rem; }
+    .game-stat-detail {
+      font-size: 0.8rem;
+      color: #888;
+      text-align: right;
+    }
+    .game-stat-played { color: #6bcb77; font-weight: 700; }
+    .game-stat-not-played { color: #555; }
+
+    .achievements-section {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.6rem;
+    }
+    .achievement-card {
+      background: #1a1a2e;
+      border-radius: 10px;
+      padding: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 2px solid transparent;
+    }
+    .achievement-card.unlocked { border-color: #ffd93d; }
+    .achievement-card.locked { opacity: 0.35; filter: grayscale(1); }
+    .achievement-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .achievement-info { min-width: 0; }
+    .achievement-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .achievement-desc {
+      font-size: 0.6rem;
+      color: #777;
+      line-height: 1.2;
+    }
+    .progress-bar-wrap {
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      background: #1a1a2e;
+      border-radius: 8px;
+      height: 12px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+      border-radius: 8px;
+      transition: width 0.5s;
+    }
+    .progress-label {
+      max-width: 700px;
+      margin: 0 auto 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    /* Name edit modal */
+    .name-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7); z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .name-modal-overlay.visible { display: flex; }
+    .name-modal {
+      background: #1a1a2e; border-radius: 16px; padding: 2rem;
+      max-width: 360px; width: 90%; text-align: center;
+    }
+    .name-modal h3 { color: #ffd93d; font-size: 1.3rem; margin-bottom: 1rem; }
+    .name-modal input {
+      width: 100%; padding: 0.7rem 1rem; border: 2px solid #2a2a3e;
+      border-radius: 8px; background: #0f0f1a; color: #e0e0e0;
+      font-size: 1rem; outline: none;
+    }
+    .name-modal input:focus { border-color: #ffd93d; }
+    .name-modal button {
+      margin-top: 1rem; padding: 0.6rem 2rem; border: none; border-radius: 8px;
+      background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+      color: #0f0f1a; font-size: 1rem; font-weight: 700; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<a href="/" class="back-link">Tilbake til spill</a>
+
+<div class="profile-header">
+  <div class="avatar" id="avatar">🎮</div>
+  <div class="profile-name" id="profile-name">Spiller</div>
+  <div class="profile-subtitle" id="profile-subtitle"></div>
+  <a class="edit-link" onclick="showEditModal()">Endre navn</a>
+</div>
+
+<div class="stats-overview" id="stats-overview"></div>
+
+<h2>Spillstatistikk</h2>
+<div class="games-stats" id="games-stats"></div>
+
+<div class="progress-label" id="ach-progress-label"></div>
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="ach-progress-fill"></div></div>
+<h2>Prestasjoner</h2>
+<div class="achievements-section">
+  <div class="achievements-grid" id="ach-grid"></div>
+</div>
+
+<div class="name-modal-overlay" id="edit-modal">
+  <div class="name-modal">
+    <h3>Endre navn</h3>
+    <input type="text" id="edit-name-input" maxlength="30" placeholder="Skriv inn nytt navn">
+    <button onclick="saveName()">Lagre</button>
+  </div>
+</div>
+
+<script src="achievements.js"></script>
+<script>
+const GAME_INFO = {
+  'snake': { name: 'Snake', icon: '🐍' },
+  'kingpinguin': { name: 'King Pinguin', icon: '🐧' },
+  'shootballoon': { name: 'Shoot Balloon', icon: '🎈' },
+  'space-invaders': { name: 'Space Invaders', icon: '👾' },
+  'tetris': { name: 'Tetris', icon: '🧱' },
+  'pong': { name: 'Pong', icon: '🏓' },
+  'breakout': { name: 'Breakout', icon: '💥' },
+  'minesweeper': { name: 'Minesweeper', icon: '💣' },
+  'eastermistery': { name: 'Easter Mistery', icon: '🥚' },
+  'multiply': { name: 'Gangetabellen', icon: '✖️' },
+  'divide': { name: 'Divisjon', icon: '➗' },
+  'memory': { name: 'Memory', icon: '🃏' },
+  'math-race': { name: 'Matteløp', icon: '🔢' },
+  'hangman': { name: 'Hangman', icon: '📝' },
+  '2048': { name: '2048', icon: '🔲' },
+  'quiz': { name: 'Quiz', icon: '🧠' },
+  'ordbok': { name: 'Ordbok', icon: '📖' },
+  'tre-paa-rad': { name: 'Tre på rad', icon: '❌' },
+  'kabal': { name: 'Kabal', icon: '🃏' },
+  'geografi': { name: 'Geografi-quiz', icon: '🌍' },
+  'tegn-og-gjett': { name: 'Tegn og gjett', icon: '🎨' },
+};
+
+function getPlayerName() {
+  return localStorage.getItem('foofy_player_name') || '';
+}
+
+function getGameStats() {
+  return JSON.parse(localStorage.getItem('foofy_game_stats') || '{}');
+}
+
+function loadPage() {
+  const name = getPlayerName();
+  document.getElementById('profile-name').textContent = name || 'Spiller';
+  document.getElementById('avatar').textContent = name ? name[0].toUpperCase() : '🎮';
+
+  const stats = getGameStats();
+  const gamesPlayed = stats.gamesPlayed || [];
+  const perfectGames = stats.perfectGames || [];
+  const unlocked = JSON.parse(localStorage.getItem('foofy_achievements') || '[]');
+  const totalAchievements = ACHIEVEMENTS.length;
+  const earnedAchievements = unlocked.length;
+
+  // Join date (approximate from first achievement or now)
+  const firstDate = unlocked.length > 0
+    ? new Date(Math.min(...unlocked.map(a => a.date)))
+    : new Date();
+  const joinStr = firstDate.toLocaleDateString('no-NO', { year: 'numeric', month: 'long' });
+
+  document.getElementById('profile-subtitle').textContent = `Spiller siden ${joinStr}`;
+
+  // Overview stats
+  const totalGames = Object.keys(GAME_INFO).length;
+  document.getElementById('stats-overview').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-value">${gamesPlayed.length}</div>
+      <div class="stat-label">Spill prøvd</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${totalGames}</div>
+      <div class="stat-label">Totalt spill</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${perfectGames.length}</div>
+      <div class="stat-label">Perfekte scores</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${earnedAchievements}</div>
+      <div class="stat-label">Prestasjoner</div>
+    </div>
+  `;
+
+  // Per-game stats
+  const gamesHTML = Object.entries(GAME_INFO).map(([folder, info]) => {
+    const played = gamesPlayed.includes(folder);
+    const perfect = perfectGames.includes(folder);
+    let detail = '';
+    if (perfect) detail = '<span style="color:#ffd93d;">⭐ Perfekt</span>';
+    else if (played) detail = '<span class="game-stat-played">✓ Spilt</span>';
+    else detail = '<span class="game-stat-not-played">Ikke spilt ennå</span>';
+
+    return `
+      <div class="game-stat-row">
+        <span class="game-stat-icon">${info.icon}</span>
+        <span class="game-stat-name">${info.name}</span>
+        <span class="game-stat-detail">${detail}</span>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('games-stats').innerHTML = gamesHTML;
+
+  // Achievements
+  const unlockedIds = new Set(unlocked.map(a => a.id));
+  const pct = totalAchievements > 0 ? Math.round((earnedAchievements / totalAchievements) * 100) : 0;
+  document.getElementById('ach-progress-label').innerHTML = `<span>Fremgang</span><span>${earnedAchievements} / ${totalAchievements} (${pct}%)</span>`;
+  document.getElementById('ach-progress-fill').style.width = pct + '%';
+
+  const achHTML = ACHIEVEMENTS.map(a => {
+    const isUnlocked = unlockedIds.has(a.id);
+    return `
+      <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}" title="${a.description}">
+        <span class="achievement-icon">${a.icon}</span>
+        <div class="achievement-info">
+          <div class="achievement-name">${a.name}</div>
+          <div class="achievement-desc">${a.description}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('ach-grid').innerHTML = achHTML;
+}
+
+function showEditModal() {
+  document.getElementById('edit-name-input').value = getPlayerName();
+  document.getElementById('edit-modal').classList.add('visible');
+  document.getElementById('edit-name-input').focus();
+}
+
+function saveName() {
+  const name = document.getElementById('edit-name-input').value.trim();
+  if (!name) return;
+  localStorage.setItem('foofy_player_name', name);
+  document.getElementById('edit-modal').classList.remove('visible');
+  loadPage();
+}
+
+document.getElementById('edit-name-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') saveName();
+});
+
+loadPage();
+</script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordbok</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: #7b8cff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #a0adff;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 18px;
+            left: 24px;
+            font-size: 1rem;
+        }
+
+        .back-link::before {
+            content: "\2190 ";
+        }
+
+        h1 {
+            margin-top: 24px;
+            font-size: 2.2rem;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        #message {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        #message.win {
+            color: #6aaa64;
+        }
+
+        #message.lose {
+            color: #e05555;
+        }
+
+        #board {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tile {
+            width: 62px;
+            height: 62px;
+            border: 2px solid #3a3a5c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #fff;
+            background: transparent;
+            transition: transform 0.1s;
+            perspective: 600px;
+        }
+
+        .tile.filled {
+            border-color: #666;
+            animation: pop 0.1s ease;
+        }
+
+        .tile.flip {
+            animation: flip 0.5s ease forwards;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes flip {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0deg); }
+        }
+
+        .tile.correct {
+            background: #538d4e;
+            border-color: #538d4e;
+        }
+
+        .tile.present {
+            background: #b59f3b;
+            border-color: #b59f3b;
+        }
+
+        .tile.absent {
+            background: #3a3a4c;
+            border-color: #3a3a4c;
+        }
+
+        #keyboard {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 24px;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .key {
+            min-width: 36px;
+            height: 52px;
+            border: none;
+            border-radius: 6px;
+            background: #5a5a7a;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            transition: background 0.2s, transform 0.1s;
+            user-select: none;
+            padding: 0 8px;
+        }
+
+        .key:hover {
+            filter: brightness(1.2);
+        }
+
+        .key:active {
+            transform: scale(0.95);
+        }
+
+        .key.wide {
+            min-width: 60px;
+            font-size: 0.75rem;
+        }
+
+        .key.correct {
+            background: #538d4e;
+        }
+
+        .key.present {
+            background: #b59f3b;
+        }
+
+        .key.absent {
+            background: #2a2a3a;
+        }
+
+        #stats {
+            margin-top: 12px;
+            display: flex;
+            gap: 24px;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        #stats span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #stats .stat-val {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+
+        #play-again {
+            display: none;
+            margin-top: 14px;
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            background: #538d4e;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #play-again:hover {
+            background: #6aaa64;
+        }
+
+        @media (max-width: 420px) {
+            .tile {
+                width: 52px;
+                height: 52px;
+                font-size: 1.5rem;
+            }
+
+            .key {
+                min-width: 28px;
+                height: 46px;
+                font-size: 0.8rem;
+                padding: 0 5px;
+            }
+
+            .key.wide {
+                min-width: 48px;
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">Tilbake til spill</a>
+    <h1>Ordbok</h1>
+    <div id="message"></div>
+    <div id="board"></div>
+    <div id="keyboard"></div>
+    <div id="stats">
+        <span><span class="stat-val" id="stat-played">0</span>Spilt</span>
+        <span><span class="stat-val" id="stat-win">0%</span>Vinnprosent</span>
+        <span><span class="stat-val" id="stat-streak">0</span>Rekke</span>
+    </div>
+    <button id="play-again">Spill igjen</button>
+
+    <script src="/achievements.js"></script>
+    <script>
+        (function () {
+            const WORDS = [
+                'huset','bilde','stole','bruke','klare','denne','andre','etter',
+                'under','vente','liten','store','siste','norsk','punkt','hvite',
+                'bryte','tenke','skape','bygge','plass','snart','kjent','aldri',
+                'spare','sterk','skole','sette','svart','holde','neste','gripe',
+                'klage','kaste','prate','glede','fjord','drikk','tjene','forme',
+                'lange','ville','virke','merke','stake','boken','blant','alene',
+                'drift','enkel','fordi','fryse','gitte','hente','igjen','jente',
+                'knapt','legge','mange','neppe','offer','pakke','rekke','sinne',
+                'telle','ulven','verdi','ytter','blyge','dytte','elske','feste',
+                'grave','hygge','ironi','jordb','kreve','lytte','modig','nevne',
+                'oksen','pling','riste','snill','trodd','ulent','vikle','yrker',
+                'bedre','deler','flykt','gryte','huske','jeget','klype','minne',
+                'nying','prate','runde','skyte','tilby','uhyre','velge','drape',
+                'evner','flyte','gjest','holdt','isbre','koble','lufte','noreg',
+                'ordne','prakt','rykke','spise','trene','unngr','verst','ankel',
+                'bunad','denne','ekorn','fylle','gruve','hoppe','kraft','modig',
+                'biter','kysse','stund','tegne','plage','treff','blime','omdel',
+                'fange','greit','himle','jobbe','knuse','lydig','melde','nyhet'
+            ];
+
+            const WORD_LENGTH = 5;
+            const MAX_ATTEMPTS = 6;
+            let targetWord = '';
+            let currentRow = 0;
+            let currentCol = 0;
+            let currentGuess = '';
+            let gameOver = false;
+            let boardTiles = [];
+            let keyElements = {};
+
+            const KEYBOARD_ROWS = [
+                ['q','w','e','r','t','y','u','i','o','p','å'],
+                ['a','s','d','f','g','h','j','k','l','ø','æ'],
+                ['enter','z','x','c','v','b','n','m','slett']
+            ];
+
+            function loadStats() {
+                try {
+                    return JSON.parse(localStorage.getItem('ordbok_stats')) || {
+                        played: 0, wins: 0, streak: 0, maxStreak: 0
+                    };
+                } catch {
+                    return { played: 0, wins: 0, streak: 0, maxStreak: 0 };
+                }
+            }
+
+            function saveStats(stats) {
+                localStorage.setItem('ordbok_stats', JSON.stringify(stats));
+            }
+
+            function updateStatsDisplay() {
+                const stats = loadStats();
+                document.getElementById('stat-played').textContent = stats.played;
+                document.getElementById('stat-win').textContent =
+                    stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) + '%' : '0%';
+                document.getElementById('stat-streak').textContent = stats.streak;
+            }
+
+            function createBoard() {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+                boardTiles = [];
+                for (let r = 0; r < MAX_ATTEMPTS; r++) {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    const rowTiles = [];
+                    for (let c = 0; c < WORD_LENGTH; c++) {
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        row.appendChild(tile);
+                        rowTiles.push(tile);
+                    }
+                    board.appendChild(row);
+                    boardTiles.push(rowTiles);
+                }
+            }
+
+            function createKeyboard() {
+                const kb = document.getElementById('keyboard');
+                kb.innerHTML = '';
+                keyElements = {};
+                KEYBOARD_ROWS.forEach(row => {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'kb-row';
+                    row.forEach(key => {
+                        const btn = document.createElement('button');
+                        btn.className = 'key' + (key === 'enter' || key === 'slett' ? ' wide' : '');
+                        btn.textContent = key === 'slett' ? '⌫' : key;
+                        btn.setAttribute('data-key', key);
+                        btn.addEventListener('click', () => handleKey(key));
+                        rowDiv.appendChild(btn);
+                        keyElements[key] = btn;
+                    });
+                    kb.appendChild(rowDiv);
+                });
+            }
+
+            function handleKey(key) {
+                if (gameOver) return;
+                if (key === 'enter') {
+                    submitGuess();
+                } else if (key === 'slett') {
+                    deleteLetter();
+                } else {
+                    addLetter(key);
+                }
+            }
+
+            function addLetter(letter) {
+                if (currentCol >= WORD_LENGTH) return;
+                boardTiles[currentRow][currentCol].textContent = letter;
+                boardTiles[currentRow][currentCol].classList.add('filled');
+                currentGuess += letter;
+                currentCol++;
+            }
+
+            function deleteLetter() {
+                if (currentCol <= 0) return;
+                currentCol--;
+                boardTiles[currentRow][currentCol].textContent = '';
+                boardTiles[currentRow][currentCol].classList.remove('filled');
+                currentGuess = currentGuess.slice(0, -1);
+            }
+
+            function submitGuess() {
+                if (currentGuess.length !== WORD_LENGTH) {
+                    showMessage('Ordet må ha 5 bokstaver');
+                    return;
+                }
+
+                const guess = currentGuess.toLowerCase();
+                const target = targetWord.toLowerCase();
+                const result = evaluateGuess(guess, target);
+
+                revealRow(currentRow, result, guess);
+
+                setTimeout(() => {
+                    if (guess === target) {
+                        endGame(true);
+                    } else if (currentRow >= MAX_ATTEMPTS - 1) {
+                        endGame(false);
+                    } else {
+                        currentRow++;
+                        currentCol = 0;
+                        currentGuess = '';
+                    }
+                }, WORD_LENGTH * 300 + 200);
+            }
+
+            function evaluateGuess(guess, target) {
+                const result = Array(WORD_LENGTH).fill('absent');
+                const targetCounts = {};
+
+                // First pass: correct positions
+                for (let i = 0; i < WORD_LENGTH; i++) {
+                    if (guess[i] === target[i]) {
+                        result[i] = 'correct';
+                    } else {
+                        targetCounts[target[i]] = (targetCounts[target[i]] || 0) + 1;
+                    }
+                }
+
+                // Second pass: present but wrong position
+                for (let i = 0; i < WORD_LENGTH; i++) {
+                    if (result[i] === 'correct') continue;
+                    if (targetCounts[guess[i]] && targetCounts[guess[i]] > 0) {
+                        result[i] = 'present';
+                        targetCounts[guess[i]]--;
+                    }
+                }
+
+                return result;
+            }
+
+            function revealRow(row, result, guess) {
+                for (let i = 0; i < WORD_LENGTH; i++) {
+                    const tile = boardTiles[row][i];
+                    const delay = i * 300;
+                    setTimeout(() => {
+                        tile.classList.add('flip');
+                        setTimeout(() => {
+                            tile.classList.add(result[i]);
+                            updateKeyColor(guess[i], result[i]);
+                        }, 250);
+                    }, delay);
+                }
+            }
+
+            function updateKeyColor(letter, state) {
+                const key = keyElements[letter];
+                if (!key) return;
+                const priority = { correct: 3, present: 2, absent: 1 };
+                const current = key.classList.contains('correct') ? 3
+                    : key.classList.contains('present') ? 2
+                    : key.classList.contains('absent') ? 1 : 0;
+                if (priority[state] > current) {
+                    key.classList.remove('correct', 'present', 'absent');
+                    key.classList.add(state);
+                }
+            }
+
+            function showMessage(text, cssClass) {
+                const msg = document.getElementById('message');
+                msg.textContent = text;
+                msg.className = cssClass || '';
+            }
+
+            function endGame(won) {
+                gameOver = true;
+                const stats = loadStats();
+                stats.played++;
+                if (won) {
+                    stats.wins++;
+                    stats.streak++;
+                    if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
+                    const messages = ['Fantastisk!', 'Imponerende!', 'Veldig bra!', 'Bra!', 'Greit!', 'Phew!'];
+                    showMessage(messages[Math.min(currentRow, messages.length - 1)], 'win');
+                } else {
+                    stats.streak = 0;
+                    showMessage('Riktig ord: ' + targetWord.toUpperCase(), 'lose');
+                }
+                saveStats(stats);
+                updateStatsDisplay();
+                document.getElementById('play-again').style.display = 'inline-block';
+            }
+
+            function pickWord() {
+                return WORDS[Math.floor(Math.random() * WORDS.length)];
+            }
+
+            function initGame() {
+                targetWord = pickWord();
+                currentRow = 0;
+                currentCol = 0;
+                currentGuess = '';
+                gameOver = false;
+                showMessage('');
+                document.getElementById('play-again').style.display = 'none';
+                createBoard();
+                createKeyboard();
+                updateStatsDisplay();
+
+                if (typeof reportEvent === 'function') {
+                    reportEvent('game_played', 'ordbok');
+                }
+            }
+
+            // Physical keyboard support
+            document.addEventListener('keydown', (e) => {
+                if (gameOver) return;
+                if (e.ctrlKey || e.metaKey || e.altKey) return;
+                const key = e.key.toLowerCase();
+                if (key === 'enter') {
+                    handleKey('enter');
+                } else if (key === 'backspace') {
+                    handleKey('slett');
+                } else if (/^[a-zæøå]$/.test(key)) {
+                    handleKey(key);
+                }
+            });
+
+            document.getElementById('play-again').addEventListener('click', initGame);
+
+            initGame();
+        })();
+    </script>
+</body>
+</html>

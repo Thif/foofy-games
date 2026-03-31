@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geografi-quiz - Spillverksted</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  a { color: #7eb8ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .back-link {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    font-size: 14px;
+    z-index: 100;
+    background: rgba(15,15,26,0.85);
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #2a2a4a;
+  }
+  .back-link::before { content: "\2190 "; }
+  .container {
+    max-width: 700px;
+    width: 100%;
+    padding: 20px;
+    margin-top: 60px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.2em;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #7eb8ff, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 32px;
+    font-size: 1.05em;
+  }
+
+  /* Mode Selection */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .mode-card {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 28px 16px;
+    color: #e0e0e0;
+    font-size: 1.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .mode-card:hover {
+    border-color: #7eb8ff;
+    background: #1e1e36;
+    transform: translateY(-2px);
+  }
+  .mode-card .icon { font-size: 2.2em; display: block; margin-bottom: 10px; }
+  .mode-card .desc { font-size: 0.82em; color: #888; margin-top: 6px; }
+
+  /* Quiz Screen */
+  .progress-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: #1a1a2e;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #7eb8ff, #c084fc);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #888;
+  }
+  .timer {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #7eb8ff;
+    min-width: 48px;
+    text-align: center;
+  }
+  .timer.warning { color: #ff6b6b; animation: pulse 0.5s infinite alternate; }
+  @keyframes pulse { to { opacity: 0.5; } }
+  .mode-tag {
+    background: #2a2a4a;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.82em;
+    color: #aaa;
+  }
+  .question-text {
+    font-size: 1.3em;
+    line-height: 1.5;
+    margin: 20px 0 28px;
+    min-height: 80px;
+  }
+  .flag-display {
+    font-size: 5em;
+    text-align: center;
+    margin: 10px 0 20px;
+  }
+  .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 500px) { .answers { grid-template-columns: 1fr; } }
+  .answer-btn {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 16px;
+    color: #e0e0e0;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .answer-btn:hover:not(.disabled) {
+    border-color: #7eb8ff;
+    background: #1e1e36;
+  }
+  .answer-btn.correct {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+  }
+  .answer-btn.wrong {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+  }
+  .answer-btn.disabled { cursor: default; opacity: 0.7; }
+  .answer-btn.disabled.reveal { border-color: #4ade80; opacity: 1; color: #4ade80; }
+
+  /* Results Screen */
+  .results-container { text-align: center; }
+  .score-display {
+    font-size: 3.5em;
+    font-weight: bold;
+    background: linear-gradient(135deg, #7eb8ff, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 20px 0 8px;
+  }
+  .score-label {
+    color: #888;
+    font-size: 1.1em;
+    margin-bottom: 24px;
+  }
+  .result-msg {
+    font-size: 1.2em;
+    margin-bottom: 28px;
+    color: #c084fc;
+  }
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .btn {
+    background: linear-gradient(135deg, #7eb8ff, #c084fc);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 28px;
+    color: #0f0f1a;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn.secondary {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    color: #e0e0e0;
+  }
+  .btn.secondary:hover { border-color: #7eb8ff; }
+
+  /* Review list */
+  .review-list { text-align: left; margin-top: 20px; }
+  .review-item {
+    background: #1a1a2e;
+    border: 1px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+  }
+  .review-item.review-correct { border-left: 4px solid #4ade80; }
+  .review-item.review-wrong { border-left: 4px solid #ff6b6b; }
+  .review-item.review-timeout { border-left: 4px solid #fbbf24; }
+  .review-q { font-weight: 600; margin-bottom: 4px; }
+  .review-a { font-size: 0.9em; color: #888; }
+  .review-a span { color: #4ade80; }
+  .review-a .user-wrong { color: #ff6b6b; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<a href="/" class="back-link">Tilbake til spill</a>
+
+<div class="container">
+  <!-- Mode Selection -->
+  <div id="mode-screen">
+    <h1>Geografi-quiz</h1>
+    <p class="subtitle">Velg en modus og test kunnskapene dine!</p>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startGame('capitals')">
+        <span class="icon">🏛️</span>
+        Europeiske hovedsteder
+        <span class="desc">Kan du hovedstedene i Europa?</span>
+      </div>
+      <div class="mode-card" onclick="startGame('flags')">
+        <span class="icon">🏳️</span>
+        Verdens flagg
+        <span class="desc">Gjenkjenn flagg fra hele verden</span>
+      </div>
+      <div class="mode-card" onclick="startGame('fylker')">
+        <span class="icon">🗺️</span>
+        Norske fylker
+        <span class="desc">Hvor godt kjenner du Norge?</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quiz-screen" class="hidden">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress"></div></div>
+    <div class="quiz-header">
+      <span id="q-counter">Spørsmål 1 / 10</span>
+      <span class="mode-tag" id="mode-label"></span>
+      <span class="timer" id="timer">15</span>
+    </div>
+    <div id="flag-area" class="flag-display hidden"></div>
+    <div class="question-text" id="question"></div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <!-- Results Screen -->
+  <div id="results-screen" class="hidden">
+    <div class="results-container">
+      <h1>Resultater</h1>
+      <div class="score-display" id="final-score"></div>
+      <div class="score-label" id="score-label"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="startGame(currentMode)">Spill igjen</button>
+        <button class="btn secondary" onclick="showModeScreen()">Velg modus</button>
+      </div>
+      <div class="review-list" id="review-list"></div>
+    </div>
+  </div>
+</div>
+
+<script src="/achievements.js"></script>
+<script>
+const QUESTIONS_PER_ROUND = 10;
+const TIME_LIMIT = 15;
+
+// ---- DATA ----
+const data = {
+  capitals: [
+    { q: "Hva er hovedstaden i Frankrike?", a: "Paris", w: ["Lyon", "Marseille", "Nice"] },
+    { q: "Hva er hovedstaden i Tyskland?", a: "Berlin", w: ["Hamburg", "München", "Frankfurt"] },
+    { q: "Hva er hovedstaden i Spania?", a: "Madrid", w: ["Barcelona", "Sevilla", "Valencia"] },
+    { q: "Hva er hovedstaden i Italia?", a: "Roma", w: ["Milano", "Napoli", "Firenze"] },
+    { q: "Hva er hovedstaden i Portugal?", a: "Lisboa", w: ["Porto", "Braga", "Faro"] },
+    { q: "Hva er hovedstaden i Polen?", a: "Warszawa", w: ["Krakow", "Gdansk", "Wroclaw"] },
+    { q: "Hva er hovedstaden i Tsjekkia?", a: "Praha", w: ["Brno", "Ostrava", "Plzen"] },
+    { q: "Hva er hovedstaden i Ungarn?", a: "Budapest", w: ["Debrecen", "Szeged", "Pecs"] },
+    { q: "Hva er hovedstaden i Østerrike?", a: "Wien", w: ["Graz", "Salzburg", "Innsbruck"] },
+    { q: "Hva er hovedstaden i Sveits?", a: "Bern", w: ["Zürich", "Genève", "Basel"] },
+    { q: "Hva er hovedstaden i Belgia?", a: "Brussel", w: ["Antwerpen", "Brugge", "Gent"] },
+    { q: "Hva er hovedstaden i Nederland?", a: "Amsterdam", w: ["Rotterdam", "Haag", "Utrecht"] },
+    { q: "Hva er hovedstaden i Sverige?", a: "Stockholm", w: ["Göteborg", "Malmö", "Uppsala"] },
+    { q: "Hva er hovedstaden i Danmark?", a: "København", w: ["Aarhus", "Odense", "Aalborg"] },
+    { q: "Hva er hovedstaden i Finland?", a: "Helsinki", w: ["Tampere", "Turku", "Oulu"] },
+    { q: "Hva er hovedstaden i Irland?", a: "Dublin", w: ["Cork", "Galway", "Limerick"] },
+    { q: "Hva er hovedstaden i Storbritannia?", a: "London", w: ["Manchester", "Edinburgh", "Birmingham"] },
+    { q: "Hva er hovedstaden i Hellas?", a: "Athen", w: ["Thessaloniki", "Patras", "Heraklion"] },
+    { q: "Hva er hovedstaden i Romania?", a: "Bucuresti", w: ["Cluj-Napoca", "Timisoara", "Iasi"] },
+    { q: "Hva er hovedstaden i Bulgaria?", a: "Sofia", w: ["Plovdiv", "Varna", "Burgas"] },
+    { q: "Hva er hovedstaden i Serbia?", a: "Beograd", w: ["Novi Sad", "Nis", "Kragujevac"] },
+    { q: "Hva er hovedstaden i Kroatia?", a: "Zagreb", w: ["Split", "Dubrovnik", "Rijeka"] },
+    { q: "Hva er hovedstaden i Slovenia?", a: "Ljubljana", w: ["Maribor", "Celje", "Kranj"] },
+    { q: "Hva er hovedstaden i Slovakia?", a: "Bratislava", w: ["Kosice", "Presov", "Zilina"] },
+    { q: "Hva er hovedstaden i Latvia?", a: "Riga", w: ["Daugavpils", "Liepaja", "Jelgava"] },
+    { q: "Hva er hovedstaden i Litauen?", a: "Vilnius", w: ["Kaunas", "Klaipeda", "Siauliai"] },
+    { q: "Hva er hovedstaden i Estland?", a: "Tallinn", w: ["Tartu", "Narva", "Parnu"] },
+    { q: "Hva er hovedstaden i Island?", a: "Reykjavik", w: ["Akureyri", "Keflavik", "Husavik"] },
+    { q: "Hva er hovedstaden i Albania?", a: "Tirana", w: ["Durres", "Vlore", "Shkoder"] },
+    { q: "Hva er hovedstaden i Nord-Makedonia?", a: "Skopje", w: ["Bitola", "Ohrid", "Kumanovo"] },
+    { q: "Hva er hovedstaden i Moldova?", a: "Chisinau", w: ["Balti", "Tiraspol", "Cahul"] },
+    { q: "Hva er hovedstaden i Montenegro?", a: "Podgorica", w: ["Budva", "Kotor", "Niksic"] },
+    { q: "Hva er hovedstaden i Ukraina?", a: "Kyiv", w: ["Kharkiv", "Odesa", "Lviv"] },
+    { q: "Hva er hovedstaden i Hviterussland?", a: "Minsk", w: ["Gomel", "Brest", "Grodno"] },
+    { q: "Hva er hovedstaden i Luxembourg?", a: "Luxembourg", w: ["Esch-sur-Alzette", "Differdange", "Dudelange"] },
+  ],
+  flags: [
+    { q: "Hvilket land har dette flagget?", flag: "🇯🇵", a: "Japan", w: ["Kina", "Sør-Korea", "Vietnam"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇧🇷", a: "Brasil", w: ["Argentina", "Colombia", "Mexico"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇨🇦", a: "Canada", w: ["USA", "Australia", "Storbritannia"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇦🇺", a: "Australia", w: ["New Zealand", "Storbritannia", "Fiji"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇮🇳", a: "India", w: ["Pakistan", "Bangladesh", "Sri Lanka"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇲🇽", a: "Mexico", w: ["Italia", "Irland", "Ungarn"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇰🇷", a: "Sør-Korea", w: ["Japan", "Nord-Korea", "Taiwan"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇿🇦", a: "Sør-Afrika", w: ["Kenya", "Nigeria", "Ghana"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇹🇷", a: "Tyrkia", w: ["Tunisia", "Pakistan", "Algerie"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇪🇬", a: "Egypt", w: ["Irak", "Syria", "Libya"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇦🇷", a: "Argentina", w: ["Uruguay", "Guatemala", "Honduras"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇸🇪", a: "Sverige", w: ["Finland", "Danmark", "Norge"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇳🇴", a: "Norge", w: ["Island", "Danmark", "Finland"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇩🇰", a: "Danmark", w: ["Sveits", "Sverige", "Finland"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇫🇮", a: "Finland", w: ["Sverige", "Estland", "Norge"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇬🇷", a: "Hellas", w: ["Uruguay", "Israel", "Argentina"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇹🇭", a: "Thailand", w: ["Kambodsja", "Laos", "Costa Rica"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇻🇳", a: "Vietnam", w: ["Kina", "Marokko", "Tyrkia"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇵🇪", a: "Peru", w: ["Canada", "Østerrike", "Latvia"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇨🇱", a: "Chile", w: ["Texas", "Cuba", "Puerto Rico"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇨🇴", a: "Colombia", w: ["Ecuador", "Venezuela", "Romania"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇳🇬", a: "Nigeria", w: ["India", "Elfenbenskysten", "Irland"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇰🇪", a: "Kenya", w: ["Sør-Sudan", "Uganda", "Tanzania"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇵🇭", a: "Filippinene", w: ["Tsjekkia", "Cuba", "Chile"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇮🇩", a: "Indonesia", w: ["Monaco", "Polen", "Singapore"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇵🇰", a: "Pakistan", w: ["Saudi-Arabia", "Algerie", "Mauritania"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇸🇦", a: "Saudi-Arabia", w: ["Iran", "Irak", "Pakistan"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇮🇱", a: "Israel", w: ["Hellas", "Honduras", "Argentina"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇨🇭", a: "Sveits", w: ["Danmark", "Tonga", "Georgia"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇵🇱", a: "Polen", w: ["Indonesia", "Monaco", "Singapore"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇺🇦", a: "Ukraina", w: ["Sverige", "Palau", "Rwanda"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇷🇴", a: "Romania", w: ["Tsjad", "Moldova", "Andorra"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇳🇿", a: "New Zealand", w: ["Australia", "Fiji", "Storbritannia"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇨🇺", a: "Cuba", w: ["Puerto Rico", "Chile", "Panama"] },
+    { q: "Hvilket land har dette flagget?", flag: "🇲🇦", a: "Marokko", w: ["Vietnam", "Tyrkia", "Tunisia"] },
+  ],
+  fylker: [
+    { q: "Hvilket fylke er Bergen hovedstad i?", a: "Vestland", w: ["Rogaland", "Møre og Romsdal", "Agder"] },
+    { q: "Hvilket fylke er Tromsø hovedstad i?", a: "Troms", w: ["Nordland", "Finnmark", "Trøndelag"] },
+    { q: "Hvilket fylke er Stavanger hovedstad i?", a: "Rogaland", w: ["Vestland", "Agder", "Vestfold"] },
+    { q: "Hvilket fylke er Kristiansand hovedstad i?", a: "Agder", w: ["Rogaland", "Vestfold", "Telemark"] },
+    { q: "Hvilket fylke er Bodø hovedstad i?", a: "Nordland", w: ["Troms", "Trøndelag", "Finnmark"] },
+    { q: "Hvilket fylke er Hamar hovedstad i?", a: "Innlandet", w: ["Akershus", "Buskerud", "Østfold"] },
+    { q: "Hvilket fylke er Drammen hovedstad i?", a: "Buskerud", w: ["Akershus", "Vestfold", "Telemark"] },
+    { q: "Hvilket fylke er Steinkjer hovedstad i?", a: "Trøndelag", w: ["Nordland", "Møre og Romsdal", "Innlandet"] },
+    { q: "Hvilket fylke er Molde hovedstad i?", a: "Møre og Romsdal", w: ["Vestland", "Trøndelag", "Sogn og Fjordane"] },
+    { q: "Hvilket fylke er Tønsberg hovedstad i?", a: "Vestfold", w: ["Buskerud", "Telemark", "Akershus"] },
+    { q: "Hvilket fylke er Skien hovedstad i?", a: "Telemark", w: ["Vestfold", "Agder", "Buskerud"] },
+    { q: "Hvor ligger Lofoten?", a: "Nordland", w: ["Troms", "Finnmark", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Hammerfest i?", a: "Finnmark", w: ["Troms", "Nordland", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Lillehammer i?", a: "Innlandet", w: ["Akershus", "Buskerud", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Fredrikstad i?", a: "Østfold", w: ["Akershus", "Buskerud", "Vestfold"] },
+    { q: "Hva er det nordligste fylket i Norge?", a: "Finnmark", w: ["Troms", "Nordland", "Trøndelag"] },
+    { q: "Hvilket fylke har flest innbyggere (utenom Oslo)?", a: "Akershus", w: ["Rogaland", "Vestland", "Innlandet"] },
+    { q: "Hvilket fylke ligger Haugesund i?", a: "Rogaland", w: ["Vestland", "Agder", "Møre og Romsdal"] },
+    { q: "Hvilket fylke ligger Ålesund i?", a: "Møre og Romsdal", w: ["Vestland", "Trøndelag", "Sogn og Fjordane"] },
+    { q: "Hvilket fylke ligger Arendal i?", a: "Agder", w: ["Vestfold", "Telemark", "Rogaland"] },
+    { q: "Hvilket fylke ligger Kongsberg i?", a: "Buskerud", w: ["Vestfold", "Telemark", "Innlandet"] },
+    { q: "Hvilket fylke ligger Narvik i?", a: "Nordland", w: ["Troms", "Finnmark", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Sarpsborg i?", a: "Østfold", w: ["Akershus", "Vestfold", "Buskerud"] },
+    { q: "Hvilket fylke er størst i areal?", a: "Innlandet", w: ["Nordland", "Troms", "Finnmark"] },
+    { q: "Hvilket fylke ligger Sandefjord i?", a: "Vestfold", w: ["Østfold", "Telemark", "Buskerud"] },
+    { q: "Hvilket fylke ligger Grimstad i?", a: "Agder", w: ["Vestfold", "Rogaland", "Telemark"] },
+    { q: "Hvilket fylke ligger Vadsø i?", a: "Finnmark", w: ["Troms", "Nordland", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Elverum i?", a: "Innlandet", w: ["Akershus", "Buskerud", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Flekkefjord i?", a: "Agder", w: ["Rogaland", "Vestland", "Telemark"] },
+    { q: "Hvilket fylke ligger Gjøvik i?", a: "Innlandet", w: ["Buskerud", "Akershus", "Trøndelag"] },
+    { q: "Hvilket fylke ligger Halden i?", a: "Østfold", w: ["Akershus", "Buskerud", "Vestfold"] },
+    { q: "Hvilket fylke ligger Kristiansund i?", a: "Møre og Romsdal", w: ["Trøndelag", "Vestland", "Nordland"] },
+    { q: "Hvilket fylke ligger Moss i?", a: "Østfold", w: ["Akershus", "Vestfold", "Buskerud"] },
+    { q: "Hvilket fylke ligger Røros i?", a: "Trøndelag", w: ["Innlandet", "Nordland", "Møre og Romsdal"] },
+    { q: "Hvilket fylke ligger Harstad i?", a: "Troms", w: ["Nordland", "Finnmark", "Trøndelag"] },
+  ]
+};
+
+const modeLabels = {
+  capitals: "Europeiske hovedsteder",
+  flags: "Verdens flagg",
+  fylker: "Norske fylker"
+};
+
+let currentMode = null;
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let timerInterval = null;
+let timeLeft = 0;
+let answered = false;
+let results = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showScreen(id) {
+  document.getElementById('mode-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function showModeScreen() {
+  showScreen('mode-screen');
+}
+
+function startGame(mode) {
+  currentMode = mode;
+  if (typeof reportEvent === 'function') reportEvent('game_played', 'geografi');
+
+  const pool = shuffle(data[mode]);
+  questions = pool.slice(0, QUESTIONS_PER_ROUND);
+  currentQ = 0;
+  score = 0;
+  results = [];
+
+  document.getElementById('mode-label').textContent = modeLabels[mode];
+  showScreen('quiz-screen');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+  document.getElementById('q-counter').textContent = `Spørsmål ${currentQ + 1} / ${QUESTIONS_PER_ROUND}`;
+  document.getElementById('progress').style.width = `${((currentQ) / QUESTIONS_PER_ROUND) * 100}%`;
+
+  const flagArea = document.getElementById('flag-area');
+  if (q.flag) {
+    flagArea.textContent = q.flag;
+    flagArea.classList.remove('hidden');
+  } else {
+    flagArea.classList.add('hidden');
+  }
+
+  document.getElementById('question').textContent = q.q;
+
+  const options = shuffle([q.a, ...q.w]);
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(btn, opt, q.a);
+    answersEl.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function startTimer() {
+  timeLeft = TIME_LIMIT;
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = timeLeft;
+  timerEl.classList.remove('warning');
+
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+    if (timeLeft <= 5) timerEl.classList.add('warning');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function timeUp() {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  results.push({ q: q.q, correct: q.a, given: null, flag: q.flag || null, timeout: true });
+
+  // Reveal correct answer
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach(btn => {
+    btn.classList.add('disabled');
+    if (btn.textContent === q.a) btn.classList.add('reveal');
+  });
+
+  setTimeout(nextQuestion, 1500);
+}
+
+function selectAnswer(btn, selected, correct) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const isCorrect = selected === correct;
+  if (isCorrect) {
+    score++;
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+  }
+
+  const q = questions[currentQ];
+  results.push({ q: q.q, correct, given: selected, flag: q.flag || null, timeout: false });
+
+  // Reveal correct if wrong
+  if (!isCorrect) {
+    document.querySelectorAll('.answer-btn').forEach(b => {
+      if (b.textContent === correct) b.classList.add('reveal');
+    });
+  }
+
+  document.querySelectorAll('.answer-btn').forEach(b => b.classList.add('disabled'));
+
+  setTimeout(nextQuestion, 1200);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= QUESTIONS_PER_ROUND) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  showScreen('results-screen');
+
+  document.getElementById('final-score').textContent = `${score} / ${QUESTIONS_PER_ROUND}`;
+  document.getElementById('score-label').textContent = `${Math.round((score / QUESTIONS_PER_ROUND) * 100)}% riktige svar`;
+
+  let msg = '';
+  const pct = score / QUESTIONS_PER_ROUND;
+  if (pct === 1) msg = 'Perfekt! Du er en geografimester!';
+  else if (pct >= 0.8) msg = 'Veldig bra! Imponerende kunnskaper!';
+  else if (pct >= 0.6) msg = 'Bra jobbet! Du kan en del geografi.';
+  else if (pct >= 0.4) msg = 'Ikke verst, men det er rom for forbedring.';
+  else msg = 'Fortsett å øve, du blir bedre!';
+  document.getElementById('result-msg').textContent = msg;
+
+  const reviewEl = document.getElementById('review-list');
+  reviewEl.innerHTML = '<h3 style="margin-bottom:12px;color:#aaa;">Gjennomgang</h3>';
+  results.forEach((r, i) => {
+    const isCorrect = r.given === r.correct;
+    const cls = r.timeout ? 'review-timeout' : (isCorrect ? 'review-correct' : 'review-wrong');
+    const div = document.createElement('div');
+    div.className = `review-item ${cls}`;
+
+    let detail = '';
+    if (r.timeout) {
+      detail = `Tiden gikk ut. Riktig svar: <span>${r.correct}</span>`;
+    } else if (isCorrect) {
+      detail = `Ditt svar: <span>${r.given}</span> ✓`;
+    } else {
+      detail = `Ditt svar: <span class="user-wrong">${r.given}</span> — Riktig: <span>${r.correct}</span>`;
+    }
+
+    div.innerHTML = `
+      <div class="review-q">${r.flag ? r.flag + ' ' : ''}${i + 1}. ${r.q}</div>
+      <div class="review-a">${detail}</div>
+    `;
+    reviewEl.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>

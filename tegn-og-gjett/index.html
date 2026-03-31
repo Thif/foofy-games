@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tegn og gjett</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        a {
+            color: #8888cc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #aaaaee;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .back-link::before {
+            content: "\2190 ";
+        }
+
+        h1 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 700px;
+            padding: 0 1rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Start screen */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 1rem 0;
+            line-height: 1.6;
+            color: #b0b0c8;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            transform: scale(1.03);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #5c5cd6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #6e6ee6;
+        }
+
+        .btn-success {
+            background: #2e8b57;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #3aa06a;
+        }
+
+        .btn-danger {
+            background: #a03040;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c04050;
+        }
+
+        .btn-secondary {
+            background: #3a3a5c;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #4a4a6c;
+        }
+
+        /* HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 0;
+            font-size: 1rem;
+            color: #c0c0d8;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e8e8ff;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+
+        .timer.warning {
+            color: #ff6666;
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 1; }
+            to { opacity: 0.5; }
+        }
+
+        .word-display {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #a0a0ff;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Canvas */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #2a2a44;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: #ffffff;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 0;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .toolbar-label {
+            font-size: 0.8rem;
+            color: #8888aa;
+            margin-right: 0.2rem;
+        }
+
+        .color-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.1s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .color-btn.active {
+            border-color: #ffffff;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+        }
+
+        .size-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #2a2a44;
+            border: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.15s;
+        }
+
+        .size-btn.active {
+            border-color: #5c5cd6;
+        }
+
+        .size-btn .dot {
+            border-radius: 50%;
+            background: #d0d0d0;
+        }
+
+        .tool-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            background: #2a2a44;
+            border: 2px solid transparent;
+            color: #c0c0d8;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .tool-btn:hover {
+            background: #3a3a5c;
+        }
+
+        .tool-btn.active {
+            border-color: #5c5cd6;
+            background: #3a3a5c;
+        }
+
+        /* Judge screen */
+        .judge-screen {
+            text-align: center;
+        }
+
+        .judge-screen .word-reveal {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #a0a0ff;
+            margin: 1rem 0;
+        }
+
+        .judge-screen p {
+            font-size: 1.15rem;
+            margin-bottom: 1.2rem;
+            color: #c0c0d8;
+        }
+
+        .judge-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        /* Results screen */
+        .results-screen {
+            text-align: center;
+        }
+
+        .results-screen .score-big {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #5c5cd6;
+            margin: 1rem 0 0.25rem;
+        }
+
+        .results-screen .score-label {
+            font-size: 1.1rem;
+            color: #8888aa;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-screen .result-msg {
+            font-size: 1.25rem;
+            color: #c0c0d8;
+            margin-bottom: 2rem;
+        }
+
+        .word-list {
+            list-style: none;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .word-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1e1e34;
+            font-size: 0.95rem;
+        }
+
+        .word-list li .status-yes {
+            color: #4caf50;
+        }
+
+        .word-list li .status-no {
+            color: #e05555;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">Tilbake til spill</a>
+    <h1>Tegn og gjett</h1>
+
+    <div class="game-container">
+        <!-- Start screen -->
+        <div id="start-screen" class="screen active start-screen">
+            <p>
+                Du får et ord å tegne. Tegn det på lerretet innen tiden går ut!<br>
+                Etter hver runde vurderer du selv om tegningen ble gjenkjennelig.<br>
+                10 runder per spill. Lykke til!
+            </p>
+            <button class="btn btn-primary" id="start-btn">Start spill</button>
+        </div>
+
+        <!-- Drawing screen -->
+        <div id="draw-screen" class="screen">
+            <div class="hud">
+                <div class="hud-item">Runde <span id="round-num">1</span>/10</div>
+                <div class="hud-item">Poeng: <span id="score-display">0</span></div>
+                <div class="hud-item"><span id="timer" class="timer">30</span>s</div>
+            </div>
+            <div class="word-display">Tegn: <span id="current-word"></span></div>
+            <div class="canvas-wrapper">
+                <canvas id="draw-canvas" width="660" height="440"></canvas>
+            </div>
+            <div class="toolbar">
+                <div class="toolbar-section" id="color-palette"></div>
+                <div class="toolbar-section">
+                    <span class="toolbar-label">Str:</span>
+                    <button class="size-btn active" data-size="4"><span class="dot" style="width:6px;height:6px;"></span></button>
+                    <button class="size-btn" data-size="10"><span class="dot" style="width:12px;height:12px;"></span></button>
+                    <button class="size-btn" data-size="20"><span class="dot" style="width:18px;height:18px;"></span></button>
+                </div>
+                <div class="toolbar-section">
+                    <button class="tool-btn" id="eraser-btn">Viskelær</button>
+                    <button class="tool-btn" id="clear-btn">Tøm</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Judge screen -->
+        <div id="judge-screen" class="screen judge-screen">
+            <p>Tiden er ute!</p>
+            <div class="word-reveal">Ordet var: <span id="reveal-word"></span></div>
+            <p>Fikk du det til?</p>
+            <div class="judge-buttons">
+                <button class="btn btn-success" id="yes-btn">Ja</button>
+                <button class="btn btn-danger" id="no-btn">Nei</button>
+            </div>
+        </div>
+
+        <!-- Results screen -->
+        <div id="results-screen" class="screen results-screen">
+            <div class="score-big" id="final-score">0</div>
+            <div class="score-label">av 10 riktige</div>
+            <div class="result-msg" id="result-msg"></div>
+            <ul class="word-list" id="word-list"></ul>
+            <button class="btn btn-primary" id="play-again-btn">Spill igjen</button>
+        </div>
+    </div>
+
+    <script src="/achievements.js"></script>
+    <script>
+    (function() {
+        const WORDS = [
+            "hund","katt","hus","bil","sol","måne","tre","blomst","fisk","fugl",
+            "båt","sykkel","fly","tog","bro","fjell","sky","regn","snø","ild",
+            "stol","bord","lampe","bok","klokke","sko","hatt","briller","paraply","nøkkel",
+            "eple","banan","jordbær","kake","pizza","is","brød","ost","kopp","gaffel",
+            "elefant","giraff","slange","edderkopp","sommerfugl","kanin","frosk","skilpadde","hai","mus",
+            "gitar","tromme","fotball","ballong","flagg","hjerte","stjerne","diamant","pil","sirkel",
+            "saks","hammer","penn","blyant","vindmølle","vulkan","robot","drage","krone","sverd"
+        ];
+
+        const COLORS = [
+            "#000000","#ffffff","#ff0000","#ff6600","#ffcc00",
+            "#33cc33","#0066ff","#9933ff","#ff66cc","#884422"
+        ];
+
+        const TOTAL_ROUNDS = 10;
+
+        let currentRound = 0;
+        let score = 0;
+        let currentWord = "";
+        let timerInterval = null;
+        let timeLeft = 30;
+        let roundResults = [];
+        let usedWords = [];
+
+        // Drawing state
+        let drawing = false;
+        let brushColor = "#000000";
+        let brushSize = 4;
+        let eraserActive = false;
+
+        // DOM refs
+        const startScreen = document.getElementById("start-screen");
+        const drawScreen = document.getElementById("draw-screen");
+        const judgeScreen = document.getElementById("judge-screen");
+        const resultsScreen = document.getElementById("results-screen");
+
+        const startBtn = document.getElementById("start-btn");
+        const canvas = document.getElementById("draw-canvas");
+        const ctx = canvas.getContext("2d");
+        const roundNum = document.getElementById("round-num");
+        const scoreDisplay = document.getElementById("score-display");
+        const timerEl = document.getElementById("timer");
+        const currentWordEl = document.getElementById("current-word");
+        const revealWordEl = document.getElementById("reveal-word");
+        const yesBtn = document.getElementById("yes-btn");
+        const noBtn = document.getElementById("no-btn");
+        const finalScoreEl = document.getElementById("final-score");
+        const resultMsg = document.getElementById("result-msg");
+        const wordListEl = document.getElementById("word-list");
+        const playAgainBtn = document.getElementById("play-again-btn");
+        const eraserBtn = document.getElementById("eraser-btn");
+        const clearBtn = document.getElementById("clear-btn");
+        const colorPalette = document.getElementById("color-palette");
+
+        function showScreen(screen) {
+            [startScreen, drawScreen, judgeScreen, resultsScreen].forEach(s => s.classList.remove("active"));
+            screen.classList.add("active");
+        }
+
+        // Build color palette
+        COLORS.forEach(c => {
+            const btn = document.createElement("button");
+            btn.className = "color-btn" + (c === "#000000" ? " active" : "");
+            btn.style.background = c;
+            if (c === "#ffffff") btn.style.border = "2px solid #666";
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                brushColor = c;
+                eraserActive = false;
+                eraserBtn.classList.remove("active");
+            });
+            colorPalette.appendChild(btn);
+        });
+
+        // Size buttons
+        document.querySelectorAll(".size-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                brushSize = parseInt(btn.dataset.size);
+            });
+        });
+
+        // Eraser
+        eraserBtn.addEventListener("click", () => {
+            eraserActive = !eraserActive;
+            eraserBtn.classList.toggle("active", eraserActive);
+        });
+
+        // Clear canvas
+        clearBtn.addEventListener("click", clearCanvas);
+
+        function clearCanvas() {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Drawing logic
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        function startDraw(e) {
+            e.preventDefault();
+            drawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            ctx.lineWidth = brushSize;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.strokeStyle = eraserActive ? "#ffffff" : brushColor;
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function stopDraw(e) {
+            if (e) e.preventDefault();
+            drawing = false;
+            ctx.beginPath();
+        }
+
+        canvas.addEventListener("mousedown", startDraw);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stopDraw);
+        canvas.addEventListener("mouseleave", stopDraw);
+        canvas.addEventListener("touchstart", startDraw, { passive: false });
+        canvas.addEventListener("touchmove", draw, { passive: false });
+        canvas.addEventListener("touchend", stopDraw);
+
+        function pickWord() {
+            const available = WORDS.filter(w => !usedWords.includes(w));
+            const word = available[Math.floor(Math.random() * available.length)];
+            usedWords.push(word);
+            return word;
+        }
+
+        function startGame() {
+            if (typeof reportEvent === "function") reportEvent("game_played", "tegn-og-gjett");
+            currentRound = 0;
+            score = 0;
+            roundResults = [];
+            usedWords = [];
+            scoreDisplay.textContent = "0";
+            startRound();
+        }
+
+        function startRound() {
+            currentRound++;
+            roundNum.textContent = currentRound;
+            currentWord = pickWord();
+            currentWordEl.textContent = currentWord;
+            clearCanvas();
+            timeLeft = 30;
+            timerEl.textContent = timeLeft;
+            timerEl.classList.remove("warning");
+            showScreen(drawScreen);
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                if (timeLeft <= 10) timerEl.classList.add("warning");
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endRound();
+                }
+            }, 1000);
+        }
+
+        function endRound() {
+            drawing = false;
+            revealWordEl.textContent = currentWord;
+            showScreen(judgeScreen);
+        }
+
+        function judgeRound(success) {
+            if (success) score++;
+            scoreDisplay.textContent = score;
+            roundResults.push({ word: currentWord, success });
+
+            if (currentRound >= TOTAL_ROUNDS) {
+                showResults();
+            } else {
+                startRound();
+            }
+        }
+
+        function showResults() {
+            finalScoreEl.textContent = score;
+            const pct = score / TOTAL_ROUNDS;
+            if (pct === 1) resultMsg.textContent = "Perfekt! Du er en mester-tegner!";
+            else if (pct >= 0.7) resultMsg.textContent = "Veldig bra! Du tegner godt!";
+            else if (pct >= 0.4) resultMsg.textContent = "Ikke verst! Øvelse gjør mester.";
+            else resultMsg.textContent = "Fortsett å øve, du blir bedre!";
+
+            wordListEl.innerHTML = "";
+            roundResults.forEach((r, i) => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span>${i + 1}. ${r.word}</span><span class="${r.success ? "status-yes" : "status-no"}">${r.success ? "Riktig" : "Feil"}</span>`;
+                wordListEl.appendChild(li);
+            });
+
+            showScreen(resultsScreen);
+        }
+
+        // Event listeners
+        startBtn.addEventListener("click", startGame);
+        yesBtn.addEventListener("click", () => judgeRound(true));
+        noBtn.addEventListener("click", () => judgeRound(false));
+        playAgainBtn.addEventListener("click", startGame);
+    })();
+    </script>
+</body>
+</html>
