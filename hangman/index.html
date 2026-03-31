@@ -221,6 +221,7 @@
     <button class="play-again-btn" id="playAgainBtn">Spill igjen</button>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
 const WORDS = [
     // Dyr
@@ -437,6 +438,8 @@ function handleGuess(letter, btnElement) {
         if (checkWin()) {
             wins++;
             winCount.textContent = wins;
+            if (typeof unlockAchievement === 'function' && wins >= 3) unlockAchievement('hangman_win3');
+            if (wrongGuesses === 0 && typeof unlockAchievement === 'function') unlockAchievement('hangman_flawless');
             message.textContent = "Du vant!";
             message.className = "message win";
             gameOver = true;
@@ -485,6 +488,7 @@ function startGame() {
     wordReveal.textContent = "";
     playAgainBtn.style.display = "none";
 
+    if (typeof reportEvent === 'function') reportEvent('game_played', 'hangman');
     pickWord();
     drawGallows();
     buildKeyboard();

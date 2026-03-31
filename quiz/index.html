@@ -290,6 +290,7 @@
   <div id="screen-results" class="hidden"></div>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
 const QUESTIONS = [
   // ===== VITENSKAP (10) =====
@@ -386,6 +387,7 @@ function startQuiz(category) {
   currentIndex = 0;
   score = 0;
   results = [];
+  if (typeof reportEvent === 'function') { reportEvent('game_played', 'quiz'); reportEvent('quiz_category', category); }
   showScreen('quiz');
   showQuestion();
 }
@@ -489,6 +491,7 @@ function showResults() {
   clearInterval(timerInterval);
   showScreen('results');
   const total = currentQuiz.length;
+  if (score === total && typeof unlockAchievement === 'function') { unlockAchievement('quiz_perfect'); reportEvent('perfect_score', 'quiz'); }
   const pct = Math.round((score / total) * 100);
   const grade = pct >= 70 ? 'great' : pct >= 40 ? 'ok' : 'bad';
 

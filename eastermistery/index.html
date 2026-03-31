@@ -451,6 +451,7 @@
   </div>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
 const img = document.getElementById('scene-img');
 const wrapper = document.getElementById('scene-wrapper');
@@ -620,6 +621,7 @@ function generateEggPositions(seedPositions, count) {
 }
 
 function startGame(themeName) {
+  if (typeof reportEvent === 'function') reportEvent('game_played', 'eastermistery');
   const theme = themes[themeName];
   totalEggs = selectedCount;
   hintUsed = false;
@@ -892,6 +894,8 @@ function win() {
   const elapsed = Math.floor((Date.now() - startTime) / 1000);
   const min = Math.floor(elapsed / 60);
   const sec = String(elapsed % 60).padStart(2, '0');
+  if (typeof unlockAchievement === 'function') { unlockAchievement('easter_5'); reportEvent('easter_scene_complete', themeName); }
+  if (elapsed < 30 && typeof unlockAchievement === 'function') unlockAchievement('easter_fast');
   setTimeout(() => {
     winTime.textContent = `You found all ${totalEggs} eggs in ${min}:${sec}!`;
     winOverlay.classList.add('show');

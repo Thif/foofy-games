@@ -181,6 +181,7 @@
   </div>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
   const EMOJIS = ['🚀','🎸','🌈','🦊','🍕','🎲','💎','🔥'];
   let cards, flippedCards, matchedPairs, moves, seconds, timerInterval, locked;
@@ -240,6 +241,8 @@
 
         if (matchedPairs === 8) {
           stopTimer();
+          if (typeof unlockAchievement === 'function') unlockAchievement('memory_win');
+          if (seconds < 60 && typeof unlockAchievement === 'function') unlockAchievement('memory_fast');
           finalMovesEl.textContent = moves;
           finalTimeEl.textContent = formatTime(seconds);
           setTimeout(() => overlay.classList.add('show'), 500);
@@ -266,6 +269,7 @@
     stopTimer();
     movesEl.textContent = '0';
     timerEl.textContent = '0:00';
+    if (typeof reportEvent === 'function') reportEvent('game_played', 'memory');
 
     const deck = shuffle([...EMOJIS, ...EMOJIS]);
     deck.forEach(emoji => {

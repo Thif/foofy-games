@@ -66,6 +66,7 @@
   </div>
   <div class="controls">Arrow keys or WASD to move</div>
 
+  <script src="/achievements.js"></script>
   <script>
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
@@ -121,6 +122,8 @@
       if (head.x === food.x && head.y === food.y) {
         score++;
         scoreEl.textContent = score;
+        if (score === 10 && typeof unlockAchievement === 'function') unlockAchievement('snake_10');
+        if (score === 25 && typeof unlockAchievement === 'function') unlockAchievement('snake_25');
         placeFood();
         // Speed up slightly
         if (speed > 60) {
@@ -202,6 +205,7 @@
         dir = { ...newDir };
         running = true;
         overlay.style.display = "none";
+        if (typeof reportEvent === 'function') reportEvent('game_played', 'snake');
         interval = setInterval(update, speed);
         update();
         return;

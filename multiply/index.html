@@ -231,6 +231,7 @@
   <button class="btn btn-ghost" onclick="show('setup-screen')">Change table</button>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
   const TOTAL         = 10;
   const QUESTION_TIME = 15;
@@ -269,6 +270,7 @@
     questions = makeQuestions();
     qIndex    = 0;
     score     = 0;
+    if (typeof reportEvent === 'function') reportEvent('game_played', 'multiply');
     show('game-screen');
     showQuestion();
   }
@@ -435,6 +437,8 @@
     else if (pct >= .8) { title = 'Well done!';  msg = 'Nearly perfect — brilliant work!'; }
     else if (pct >= .6) { title = 'Good job!';   msg = 'Solid effort — keep practicing!'; }
     else                { title = 'Keep going!'; msg = "Practice every day and you'll smash it!"; }
+
+    if (score === TOTAL && typeof unlockAchievement === 'function') { unlockAchievement('multiply_perfect'); reportEvent('perfect_score', 'multiply'); }
 
     document.getElementById('results-title').textContent = title;
     document.getElementById('encouragement').textContent = msg;

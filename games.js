@@ -126,54 +126,19 @@ async function loadExclusions() {
   } catch (e) {}
 }
 
-const btnStyle = `
-  padding: 0.5rem 1.4rem;
-  border: none;
-  border-radius: 20px;
-  background: #1a1a2e;
-  color: #999;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-transform: capitalize;
-  transition: all 0.2s;
-`;
-const btnActiveStyle = `
-  padding: 0.5rem 1.4rem;
-  border: none;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #ff6b6b, #ffd93d);
-  color: #0f0f1a;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  text-transform: capitalize;
-  transition: all 0.2s;
-`;
-
-function updateButtonStyles() {
-  document.querySelectorAll("[data-cat-btn]").forEach(btn => {
-    const isActive = btn.classList.contains("active");
-    btn.style.cssText = isActive ? btnActiveStyle : btnStyle;
-  });
-}
-
 function buildCategoryFilters() {
   const allCats = new Set();
   games.forEach(g => (g.categories || []).forEach(c => allCats.add(c)));
 
   const container = document.getElementById("category-filters");
-  container.style.cssText = "display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center; margin-bottom:2rem; padding:1rem;";
 
   const allBtn = document.createElement("button");
   allBtn.textContent = "All";
-  allBtn.classList.add("active");
-  allBtn.setAttribute("data-cat-btn", "");
+  allBtn.className = "cat-btn active";
   allBtn.onclick = () => {
     activeCategories.clear();
-    document.querySelectorAll("[data-cat-btn]").forEach(b => b.classList.remove("active"));
+    container.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
     allBtn.classList.add("active");
-    updateButtonStyles();
     renderGames();
   };
   container.appendChild(allBtn);
@@ -181,7 +146,7 @@ function buildCategoryFilters() {
   [...allCats].sort().forEach(cat => {
     const btn = document.createElement("button");
     btn.textContent = cat;
-    btn.setAttribute("data-cat-btn", "");
+    btn.className = "cat-btn";
     btn.onclick = () => {
       if (activeCategories.has(cat)) {
         activeCategories.delete(cat);
@@ -191,13 +156,12 @@ function buildCategoryFilters() {
         btn.classList.add("active");
       }
       allBtn.classList.toggle("active", activeCategories.size === 0);
-      updateButtonStyles();
       renderGames();
     };
     container.appendChild(btn);
   });
 
-  updateButtonStyles();
+
 }
 
 function renderGames() {
@@ -224,7 +188,7 @@ function renderGames() {
     .map(
       (game) => `
     <a class="game-card" href="/${game.folder}/">
-      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
       <div class="thumbnail placeholder" style="display:none">${game.name[0]}</div>
       <div class="info">
         <h2>${game.name}</h2>

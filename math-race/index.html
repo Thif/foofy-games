@@ -321,6 +321,7 @@
   </div>
 </div>
 
+<script src="/achievements.js"></script>
 <script>
   let score, timeLeft, streak, bestStreak, correct, wrong, correctIndex;
   let timerInterval = null;
@@ -340,6 +341,7 @@
   function startGame() {
     score = 0; timeLeft = 60; streak = 0; bestStreak = 0;
     correct = 0; wrong = 0; answering = false;
+    if (typeof reportEvent === 'function') reportEvent('game_played', 'math-race');
     updateHUD();
     showScreen('game');
     generateQuestion();
@@ -456,6 +458,8 @@
       correct++;
       streak++;
       if (streak > bestStreak) bestStreak = streak;
+      if (score === 20 && typeof unlockAchievement === 'function') unlockAchievement('mathrace_20');
+      if (streak === 10 && typeof unlockAchievement === 'function') unlockAchievement('mathrace_streak10');
     } else {
       wrong++;
       streak = 0;

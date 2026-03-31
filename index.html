@@ -3,10 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Foofy Games — a collection of fun browser games created with love by Forest Family. Play Snake, Tetris, Pong, and more!">
+  <meta property="og:title" content="Foofy Games">
+  <meta property="og:description" content="A collection of fun browser games created with love by Forest Family.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
   <title>Foofy Games</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a href="#games-grid" class="skip-link">Skip to games</a>
   <header>
     <h1>Foofy Games</h1>
     <p class="tagline">Created with ❤️ by Forest Family</p>
@@ -19,10 +25,14 @@
     </section>
   </main>
 
+  <section id="achievements-section" class="achievements-section"></section>
+
   <footer>
     <p>&copy; 2026 Foofy Games</p>
   </footer>
 
+  <script src="achievements.js"></script>
   <script src="games.js"></script>
+  <script>renderAchievementsSection();</script>
 </body>
 </html>
