@@ -29,7 +29,25 @@ function updateGreeting() {
   const name = getPlayerName();
   const el = document.getElementById('player-greeting');
   if (name) {
-    el.innerHTML = `Hei, ${name}! <a href="/profil.html" class="profile-link-btn" aria-label="Min profil">👤 Min profil</a> <button class="edit-name-btn" onclick="showNameModal()" aria-label="Endre navn">&#9998;</button>`;
+    el.textContent = '';
+    el.appendChild(document.createTextNode('Hei, ' + name + '! '));
+
+    const profileLink = document.createElement('a');
+    profileLink.href = '/profil.html';
+    profileLink.className = 'profile-link-btn';
+    profileLink.setAttribute('aria-label', 'Min profil');
+    profileLink.textContent = '\uD83D\uDC64 Min profil';
+    el.appendChild(profileLink);
+
+    el.appendChild(document.createTextNode(' '));
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'edit-name-btn';
+    editBtn.setAttribute('aria-label', 'Endre navn');
+    editBtn.innerHTML = '&#9998;';
+    editBtn.addEventListener('click', showNameModal);
+    el.appendChild(editBtn);
+
     el.style.display = '';
   } else {
     el.style.display = 'none';

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8A838"/>
+      <stop offset="100%" stop-color="#D4654A"/>
+    </linearGradient>
+    <linearGradient id="btn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B9E84"/>
+      <stop offset="100%" stop-color="#4A7A60"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+  <!-- Controller body -->
+  <path d="M28 58 C28 48, 38 40, 50 40 L78 40 C90 40, 100 48, 100 58 L100 72 C100 78, 96 86, 90 88 L82 90 C78 91, 74 88, 72 84 L70 78 C68 74, 64 72, 64 72 C64 72, 60 74, 58 78 L56 84 C54 88, 50 91, 46 90 L38 88 C32 86, 28 78, 28 72 Z" fill="#fff" opacity="0.95"/>
+  <!-- D-pad -->
+  <rect x="39" y="57" width="6" height="18" rx="2" fill="url(#btn)"/>
+  <rect x="33" y="63" width="18" height="6" rx="2" fill="url(#btn)"/>
+  <!-- Buttons -->
+  <circle cx="83" cy="58" r="5" fill="#D4654A"/>
+  <circle cx="93" cy="66" r="5" fill="#E8A838"/>
+  <!-- Sparkle/star accent -->
+  <path d="M18 22 L20 28 L26 30 L20 32 L18 38 L16 32 L10 30 L16 28 Z" fill="#fff" opacity="0.7"/>
+  <path d="M106 16 L107.5 20 L112 21.5 L107.5 23 L106 27 L104.5 23 L100 21.5 L104.5 20 Z" fill="#fff" opacity="0.5"/>
+</svg>
