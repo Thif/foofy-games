@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Trivia - Foofy Games</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f1a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  a { color: #7eb8ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .back-link {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    font-size: 14px;
+    z-index: 100;
+    background: rgba(15,15,26,0.85);
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid #2a2a4a;
+  }
+  .back-link::before { content: "\2190 "; }
+  .container {
+    max-width: 700px;
+    width: 100%;
+    padding: 20px;
+    margin-top: 60px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.2em;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #7eb8ff, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 32px;
+    font-size: 1.05em;
+  }
+
+  /* Category Selection */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .cat-btn {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 22px 16px;
+    color: #e0e0e0;
+    font-size: 1.05em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .cat-btn:hover {
+    border-color: #7eb8ff;
+    background: #1e1e36;
+    transform: translateY(-2px);
+  }
+  .cat-btn .icon { font-size: 1.8em; display: block; margin-bottom: 8px; }
+  .cat-btn.all { border-color: #c084fc; }
+  .cat-btn.all:hover { border-color: #d4a0ff; background: #221e36; }
+
+  /* Quiz Screen */
+  .progress-bar-wrap {
+    width: 100%;
+    height: 8px;
+    background: #1a1a2e;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #7eb8ff, #c084fc);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #888;
+  }
+  .timer {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #7eb8ff;
+    min-width: 48px;
+    text-align: center;
+  }
+  .timer.warning { color: #ff6b6b; animation: pulse 0.5s infinite alternate; }
+  @keyframes pulse { to { opacity: 0.5; } }
+  .category-tag {
+    background: #2a2a4a;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.82em;
+    color: #aaa;
+  }
+  .question-text {
+    font-size: 1.3em;
+    line-height: 1.5;
+    margin: 20px 0 28px;
+    min-height: 80px;
+  }
+  .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 500px) { .answers { grid-template-columns: 1fr; } }
+  .answer-btn {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    border-radius: 10px;
+    padding: 16px;
+    color: #e0e0e0;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .answer-btn:hover:not(.disabled) {
+    border-color: #7eb8ff;
+    background: #1e1e36;
+  }
+  .answer-btn.correct {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+  }
+  .answer-btn.wrong {
+    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.15);
+    color: #ff6b6b;
+  }
+  .answer-btn.disabled { cursor: default; opacity: 0.6; }
+  .answer-btn .letter {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    text-align: center;
+    border-radius: 6px;
+    background: #2a2a4a;
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 0.85em;
+    flex-shrink: 0;
+  }
+  .answer-btn.correct .letter { background: #4ade80; color: #0f0f1a; }
+  .answer-btn.wrong .letter { background: #ff6b6b; color: #0f0f1a; }
+
+  /* Results */
+  .results-card {
+    background: #1a1a2e;
+    border: 2px solid #2a2a4a;
+    border-radius: 16px;
+    padding: 36px;
+    text-align: center;
+    margin-top: 16px;
+  }
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 6px solid #2a2a4a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .score-circle.great { border-color: #4ade80; }
+  .score-circle.ok { border-color: #facc15; }
+  .score-circle.bad { border-color: #ff6b6b; }
+  .score-num { font-size: 2.6em; font-weight: bold; }
+  .score-label { font-size: 0.85em; color: #888; }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 20px 0 28px;
+  }
+  .stat { text-align: center; }
+  .stat-val { font-size: 1.4em; font-weight: bold; color: #c084fc; }
+  .stat-lbl { font-size: 0.82em; color: #888; margin-top: 2px; }
+  .btn {
+    background: linear-gradient(135deg, #7eb8ff, #c084fc);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 32px;
+    color: #0f0f1a;
+    font-size: 1.05em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin: 6px;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: #2a2a4a;
+    color: #e0e0e0;
+  }
+
+  /* Review */
+  .review-section { margin-top: 28px; text-align: left; }
+  .review-section h3 { margin-bottom: 16px; text-align: center; color: #aaa; }
+  .review-item {
+    background: #12121f;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+    border-left: 4px solid #2a2a4a;
+  }
+  .review-item.was-correct { border-left-color: #4ade80; }
+  .review-item.was-wrong { border-left-color: #ff6b6b; }
+  .review-q { font-weight: 600; margin-bottom: 6px; }
+  .review-a { font-size: 0.9em; color: #888; }
+  .review-a span { color: #4ade80; font-weight: 600; }
+  .review-your { font-size: 0.9em; color: #ff6b6b; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<a href="/" class="back-link">Back to Games</a>
+
+<div class="container">
+  <!-- CATEGORY SCREEN -->
+  <div id="screen-category">
+    <h1>Quiz Trivia</h1>
+    <p class="subtitle">Test your knowledge across multiple categories</p>
+    <div class="category-grid">
+      <button class="cat-btn all" onclick="startQuiz('all')">
+        <span class="icon">&#127922;</span>All Categories
+      </button>
+      <button class="cat-btn" onclick="startQuiz('Science')">
+        <span class="icon">&#129514;</span>Science
+      </button>
+      <button class="cat-btn" onclick="startQuiz('History')">
+        <span class="icon">&#127984;</span>History
+      </button>
+      <button class="cat-btn" onclick="startQuiz('Geography')">
+        <span class="icon">&#127758;</span>Geography
+      </button>
+      <button class="cat-btn" onclick="startQuiz('Sports')">
+        <span class="icon">&#9917;</span>Sports
+      </button>
+      <button class="cat-btn" onclick="startQuiz('Entertainment')">
+        <span class="icon">&#127916;</span>Entertainment
+      </button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz" class="hidden">
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress"></div></div>
+    <div class="quiz-header">
+      <span id="q-counter">Question 1 / 10</span>
+      <span class="category-tag" id="q-category"></span>
+      <span class="timer" id="timer">15</span>
+    </div>
+    <div class="question-text" id="q-text"></div>
+    <div class="answers" id="answers"></div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="hidden"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  // ===== SCIENCE (10) =====
+  {cat:"Science",q:"What is the chemical symbol for gold?",a:["Au","Ag","Fe","Cu"],c:0},
+  {cat:"Science",q:"How many bones are in the adult human body?",a:["206","208","196","212"],c:0},
+  {cat:"Science",q:"What planet is known as the Red Planet?",a:["Mars","Venus","Jupiter","Saturn"],c:0},
+  {cat:"Science",q:"What gas do plants absorb from the atmosphere?",a:["Carbon Dioxide","Oxygen","Nitrogen","Hydrogen"],c:0},
+  {cat:"Science",q:"What is the speed of light approximately in km/s?",a:["300,000","150,000","500,000","1,000,000"],c:0},
+  {cat:"Science",q:"What is the powerhouse of the cell?",a:["Mitochondria","Nucleus","Ribosome","Golgi apparatus"],c:0},
+  {cat:"Science",q:"What element has the atomic number 1?",a:["Hydrogen","Helium","Lithium","Carbon"],c:0},
+  {cat:"Science",q:"Which planet has the most moons in our solar system?",a:["Saturn","Jupiter","Uranus","Neptune"],c:0},
+  {cat:"Science",q:"What is the hardest natural substance on Earth?",a:["Diamond","Quartz","Topaz","Ruby"],c:0},
+  {cat:"Science",q:"What type of animal is a seahorse?",a:["Fish","Crustacean","Mammal","Reptile"],c:0},
+
+  // ===== HISTORY (10) =====
+  {cat:"History",q:"In what year did World War II end?",a:["1945","1944","1946","1943"],c:0},
+  {cat:"History",q:"Who was the first President of the United States?",a:["George Washington","John Adams","Thomas Jefferson","Benjamin Franklin"],c:0},
+  {cat:"History",q:"The ancient city of Rome was built on how many hills?",a:["7","5","9","3"],c:0},
+  {cat:"History",q:"Which empire built Machu Picchu?",a:["Inca","Aztec","Maya","Olmec"],c:0},
+  {cat:"History",q:"In what year did the Berlin Wall fall?",a:["1989","1991","1987","1990"],c:0},
+  {cat:"History",q:"Who painted the ceiling of the Sistine Chapel?",a:["Michelangelo","Leonardo da Vinci","Raphael","Donatello"],c:0},
+  {cat:"History",q:"What was the longest war in history?",a:["Reconquista","Hundred Years' War","Thirty Years' War","Punic Wars"],c:0},
+  {cat:"History",q:"Which country gifted the Statue of Liberty to the USA?",a:["France","United Kingdom","Germany","Spain"],c:0},
+  {cat:"History",q:"Who discovered penicillin?",a:["Alexander Fleming","Louis Pasteur","Joseph Lister","Robert Koch"],c:0},
+  {cat:"History",q:"The Titanic sank in which year?",a:["1912","1905","1915","1920"],c:0},
+
+  // ===== GEOGRAPHY (9) =====
+  {cat:"Geography",q:"What is the largest desert in the world?",a:["Antarctica","Sahara","Arabian","Gobi"],c:0},
+  {cat:"Geography",q:"Which river is the longest in the world?",a:["Nile","Amazon","Yangtze","Mississippi"],c:0},
+  {cat:"Geography",q:"What is the smallest country in the world?",a:["Vatican City","Monaco","San Marino","Liechtenstein"],c:0},
+  {cat:"Geography",q:"On which continent is the Sahara Desert located?",a:["Africa","Asia","Australia","South America"],c:0},
+  {cat:"Geography",q:"What is the capital of Australia?",a:["Canberra","Sydney","Melbourne","Brisbane"],c:0},
+  {cat:"Geography",q:"Which ocean is the largest?",a:["Pacific","Atlantic","Indian","Arctic"],c:0},
+  {cat:"Geography",q:"Mount Everest is located in which mountain range?",a:["Himalayas","Andes","Alps","Rockies"],c:0},
+  {cat:"Geography",q:"What country has the most natural lakes?",a:["Canada","Finland","Sweden","Russia"],c:0},
+  {cat:"Geography",q:"What is the capital of Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0},
+
+  // ===== SPORTS (9) =====
+  {cat:"Sports",q:"How many players are on a standard soccer team on the field?",a:["11","10","9","12"],c:0},
+  {cat:"Sports",q:"In which sport would you perform a slam dunk?",a:["Basketball","Volleyball","Tennis","Handball"],c:0},
+  {cat:"Sports",q:"How many Grand Slam tennis tournaments are there per year?",a:["4","5","3","6"],c:0},
+  {cat:"Sports",q:"Which country hosted the 2016 Summer Olympics?",a:["Brazil","United Kingdom","China","Japan"],c:0},
+  {cat:"Sports",q:"How long is a marathon in miles (approximately)?",a:["26.2","24.5","28.1","30.0"],c:0},
+  {cat:"Sports",q:"In which sport is the term 'birdie' used?",a:["Golf","Badminton","Cricket","Tennis"],c:0},
+  {cat:"Sports",q:"What is the national sport of Canada?",a:["Lacrosse","Ice Hockey","Curling","Baseball"],c:0},
+  {cat:"Sports",q:"Which country won the first FIFA World Cup in 1930?",a:["Uruguay","Brazil","Argentina","Italy"],c:0},
+  {cat:"Sports",q:"How many points is a touchdown worth in American football?",a:["6","7","3","4"],c:0},
+
+  // ===== ENTERTAINMENT (9) =====
+  {cat:"Entertainment",q:"Who directed the movie 'Jurassic Park'?",a:["Steven Spielberg","James Cameron","George Lucas","Ridley Scott"],c:0},
+  {cat:"Entertainment",q:"What is the name of the fictional continent in Game of Thrones?",a:["Westeros","Narnia","Middle-earth","Tamriel"],c:0},
+  {cat:"Entertainment",q:"Which band recorded the album 'Abbey Road'?",a:["The Beatles","The Rolling Stones","Led Zeppelin","Pink Floyd"],c:0},
+  {cat:"Entertainment",q:"In the movie 'The Matrix', what color pill does Neo take?",a:["Red","Blue","Green","Yellow"],c:0},
+  {cat:"Entertainment",q:"What is the highest-grossing film of all time (unadjusted)?",a:["Avatar","Avengers: Endgame","Titanic","Star Wars: The Force Awakens"],c:0},
+  {cat:"Entertainment",q:"Who played Jack Sparrow in Pirates of the Caribbean?",a:["Johnny Depp","Orlando Bloom","Brad Pitt","Robert Downey Jr."],c:0},
+  {cat:"Entertainment",q:"What year was the original Super Mario Bros. released?",a:["1985","1983","1987","1990"],c:0},
+  {cat:"Entertainment",q:"Which TV show features a character named Walter White?",a:["Breaking Bad","Better Call Saul","The Wire","Ozark"],c:0},
+  {cat:"Entertainment",q:"Who wrote the Harry Potter book series?",a:["J.K. Rowling","J.R.R. Tolkien","C.S. Lewis","Suzanne Collins"],c:0},
+];
+
+let currentQuiz = [];
+let currentIndex = 0;
+let score = 0;
+let timerInterval = null;
+let timeLeft = 0;
+let answered = false;
+let results = [];
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz(category) {
+  let pool = category === 'all' ? [...QUESTIONS] : QUESTIONS.filter(q => q.cat === category);
+  // Shuffle and pick each question, also shuffle answers
+  shuffle(pool);
+  currentQuiz = pool.slice(0, 10).map(q => {
+    // Build shuffled answer indices
+    let indices = [0, 1, 2, 3];
+    shuffle(indices);
+    return {
+      cat: q.cat,
+      q: q.q,
+      answers: indices.map(i => q.a[i]),
+      correct: indices.indexOf(q.c)
+    };
+  });
+  currentIndex = 0;
+  score = 0;
+  results = [];
+  showScreen('quiz');
+  showQuestion();
+}
+
+function showScreen(name) {
+  document.getElementById('screen-category').classList.toggle('hidden', name !== 'category');
+  document.getElementById('screen-quiz').classList.toggle('hidden', name !== 'quiz');
+  document.getElementById('screen-results').classList.toggle('hidden', name !== 'results');
+}
+
+function showQuestion() {
+  answered = false;
+  const q = currentQuiz[currentIndex];
+  document.getElementById('q-counter').textContent = `Question ${currentIndex + 1} / ${currentQuiz.length}`;
+  document.getElementById('q-category').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('progress').style.width = ((currentIndex) / currentQuiz.length * 100) + '%';
+
+  const letters = ['A', 'B', 'C', 'D'];
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  q.answers.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span>${ans}`;
+    btn.onclick = () => selectAnswer(i);
+    answersEl.appendChild(btn);
+  });
+
+  startTimer();
+}
+
+function startTimer() {
+  timeLeft = 15;
+  const timerEl = document.getElementById('timer');
+  timerEl.textContent = timeLeft;
+  timerEl.classList.remove('warning');
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = timeLeft;
+    if (timeLeft <= 5) timerEl.classList.add('warning');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeUp();
+    }
+  }, 1000);
+}
+
+function timeUp() {
+  if (answered) return;
+  answered = true;
+  const q = currentQuiz[currentIndex];
+  const btns = document.querySelectorAll('.answer-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === q.correct) btn.classList.add('correct');
+  });
+  results.push({ q: q.q, cat: q.cat, correct: q.answers[q.correct], yours: 'No answer (time up)', wasCorrect: false });
+  setTimeout(nextQuestion, 1500);
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+  const q = currentQuiz[currentIndex];
+  const btns = document.querySelectorAll('.answer-btn');
+  const isCorrect = idx === q.correct;
+
+  if (isCorrect) {
+    score++;
+    btns[idx].classList.add('correct');
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+  }
+  btns.forEach(b => b.classList.add('disabled'));
+
+  results.push({
+    q: q.q,
+    cat: q.cat,
+    correct: q.answers[q.correct],
+    yours: q.answers[idx],
+    wasCorrect: isCorrect
+  });
+
+  setTimeout(nextQuestion, 1200);
+}
+
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex >= currentQuiz.length) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showResults() {
+  clearInterval(timerInterval);
+  showScreen('results');
+  const total = currentQuiz.length;
+  const pct = Math.round((score / total) * 100);
+  const grade = pct >= 70 ? 'great' : pct >= 40 ? 'ok' : 'bad';
+
+  let reviewHTML = results.map(r => {
+    const cls = r.wasCorrect ? 'was-correct' : 'was-wrong';
+    let inner = `<div class="review-q">${r.q}</div><div class="review-a">Correct answer: <span>${r.correct}</span></div>`;
+    if (!r.wasCorrect) inner += `<div class="review-your">Your answer: ${r.yours}</div>`;
+    return `<div class="review-item ${cls}">${inner}</div>`;
+  }).join('');
+
+  document.getElementById('screen-results').innerHTML = `
+    <h1>Results</h1>
+    <div class="results-card">
+      <div class="score-circle ${grade}">
+        <div class="score-num">${score}/${total}</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Accuracy</div></div>
+        <div class="stat"><div class="stat-val">${score}</div><div class="stat-lbl">Correct</div></div>
+        <div class="stat"><div class="stat-val">${total - score}</div><div class="stat-lbl">Wrong</div></div>
+      </div>
+      <button class="btn" onclick="startQuiz('all')">Play Again (All)</button>
+      <button class="btn btn-secondary" onclick="backToCategories()">Choose Category</button>
+    </div>
+    <div class="review-section">
+      <h3>Answer Review</h3>
+      ${reviewHTML}
+    </div>
+  `;
+}
+
+function backToCategories() {
+  clearInterval(timerInterval);
+  showScreen('category');
+}
+</script>
+</body>
+</html>

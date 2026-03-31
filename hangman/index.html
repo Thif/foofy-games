@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0f0f1a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        a {
+            color: #7b8cff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #a0adff;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 18px;
+            left: 24px;
+            font-size: 1rem;
+        }
+
+        .back-link::before {
+            content: "\2190 ";
+        }
+
+        h1 {
+            margin-top: 24px;
+            font-size: 2.2rem;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        .score-board {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #aaa;
+        }
+
+        .score-board span {
+            font-weight: bold;
+        }
+
+        .wins { color: #4caf50; }
+        .losses { color: #f44336; }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 16px;
+            gap: 18px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        canvas {
+            background: #16162a;
+            border-radius: 12px;
+            border: 1px solid #2a2a4a;
+        }
+
+        .category-hint {
+            font-size: 1.1rem;
+            color: #7b8cff;
+            letter-spacing: 1px;
+        }
+
+        .word-display {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 48px;
+        }
+
+        .word-letter {
+            width: 36px;
+            height: 44px;
+            border-bottom: 3px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            max-width: 520px;
+            margin-top: 6px;
+        }
+
+        .key-btn {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 8px;
+            background: #2a2a4a;
+            color: #e0e0e0;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s, color 0.2s;
+        }
+
+        .key-btn:hover:not(:disabled) {
+            background: #3d3d6b;
+            transform: scale(1.08);
+        }
+
+        .key-btn:disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .key-btn.correct {
+            background: #2e7d32;
+            color: #fff;
+        }
+
+        .key-btn.wrong {
+            background: #c62828;
+            color: #fff;
+            opacity: 0.6;
+        }
+
+        .message {
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-height: 36px;
+            text-align: center;
+        }
+
+        .message.win { color: #4caf50; }
+        .message.lose { color: #f44336; }
+
+        .play-again-btn {
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background: #7b8cff;
+            color: #0f0f1a;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: none;
+        }
+
+        .play-again-btn:hover {
+            background: #a0adff;
+            transform: scale(1.05);
+        }
+
+        .word-reveal {
+            font-size: 1rem;
+            color: #aaa;
+            min-height: 22px;
+            text-align: center;
+        }
+
+        @media (max-width: 540px) {
+            .key-btn {
+                width: 34px;
+                height: 36px;
+                font-size: 0.85rem;
+            }
+            .word-letter {
+                width: 28px;
+                height: 36px;
+                font-size: 1.2rem;
+            }
+            canvas {
+                width: 280px;
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<a href="/" class="back-link">Back to games</a>
+
+<h1>Hangman</h1>
+<div class="score-board">
+    Wins: <span class="wins" id="winCount">0</span> &nbsp;|&nbsp;
+    Losses: <span class="losses" id="lossCount">0</span>
+</div>
+
+<div class="game-area">
+    <canvas id="canvas" width="320" height="280"></canvas>
+    <div class="category-hint" id="categoryHint"></div>
+    <div class="word-display" id="wordDisplay"></div>
+    <div class="message" id="message"></div>
+    <div class="word-reveal" id="wordReveal"></div>
+    <div class="keyboard" id="keyboard"></div>
+    <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+</div>
+
+<script>
+const WORDS = [
+    // Animals
+    { word: "elephant", category: "Animal" },
+    { word: "giraffe", category: "Animal" },
+    { word: "penguin", category: "Animal" },
+    { word: "dolphin", category: "Animal" },
+    { word: "cheetah", category: "Animal" },
+    { word: "kangaroo", category: "Animal" },
+    { word: "octopus", category: "Animal" },
+    { word: "panther", category: "Animal" },
+    { word: "flamingo", category: "Animal" },
+    { word: "tortoise", category: "Animal" },
+    // Countries
+    { word: "brazil", category: "Country" },
+    { word: "japan", category: "Country" },
+    { word: "germany", category: "Country" },
+    { word: "australia", category: "Country" },
+    { word: "canada", category: "Country" },
+    { word: "mexico", category: "Country" },
+    { word: "norway", category: "Country" },
+    { word: "portugal", category: "Country" },
+    { word: "thailand", category: "Country" },
+    { word: "argentina", category: "Country" },
+    // Food
+    { word: "spaghetti", category: "Food" },
+    { word: "pancake", category: "Food" },
+    { word: "avocado", category: "Food" },
+    { word: "chocolate", category: "Food" },
+    { word: "hamburger", category: "Food" },
+    { word: "sushi", category: "Food" },
+    { word: "croissant", category: "Food" },
+    { word: "burrito", category: "Food" },
+    { word: "pretzel", category: "Food" },
+    { word: "tiramisu", category: "Food" },
+    // Sports
+    { word: "basketball", category: "Sport" },
+    { word: "swimming", category: "Sport" },
+    { word: "volleyball", category: "Sport" },
+    { word: "badminton", category: "Sport" },
+    { word: "cricket", category: "Sport" },
+    { word: "archery", category: "Sport" },
+    { word: "fencing", category: "Sport" },
+    { word: "gymnastics", category: "Sport" },
+    { word: "marathon", category: "Sport" },
+    { word: "wrestling", category: "Sport" },
+    // Music
+    { word: "guitar", category: "Music" },
+    { word: "trumpet", category: "Music" },
+    { word: "piano", category: "Music" },
+    { word: "violin", category: "Music" },
+    { word: "saxophone", category: "Music" },
+    { word: "harmonica", category: "Music" },
+    { word: "accordion", category: "Music" },
+    { word: "ukulele", category: "Music" },
+    // Science
+    { word: "molecule", category: "Science" },
+    { word: "gravity", category: "Science" },
+    { word: "neutron", category: "Science" },
+    { word: "oxygen", category: "Science" },
+    { word: "telescope", category: "Science" },
+    { word: "eclipse", category: "Science" },
+    { word: "volcano", category: "Science" },
+    { word: "chromosome", category: "Science" }
+];
+
+const MAX_WRONG = 6;
+let currentWord = "";
+let currentCategory = "";
+let guessedLetters = new Set();
+let wrongGuesses = 0;
+let wins = 0;
+let losses = 0;
+let gameOver = false;
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const wordDisplay = document.getElementById("wordDisplay");
+const categoryHint = document.getElementById("categoryHint");
+const keyboard = document.getElementById("keyboard");
+const message = document.getElementById("message");
+const wordReveal = document.getElementById("wordReveal");
+const playAgainBtn = document.getElementById("playAgainBtn");
+const winCount = document.getElementById("winCount");
+const lossCount = document.getElementById("lossCount");
+
+function pickWord() {
+    const entry = WORDS[Math.floor(Math.random() * WORDS.length)];
+    currentWord = entry.word.toLowerCase();
+    currentCategory = entry.category;
+}
+
+function buildKeyboard() {
+    keyboard.innerHTML = "";
+    for (let i = 0; i < 26; i++) {
+        const letter = String.fromCharCode(65 + i);
+        const btn = document.createElement("button");
+        btn.className = "key-btn";
+        btn.textContent = letter;
+        btn.dataset.letter = letter.toLowerCase();
+        btn.addEventListener("click", () => handleGuess(letter.toLowerCase(), btn));
+        keyboard.appendChild(btn);
+    }
+}
+
+function renderWord() {
+    wordDisplay.innerHTML = "";
+    for (const ch of currentWord) {
+        const span = document.createElement("span");
+        span.className = "word-letter";
+        span.textContent = guessedLetters.has(ch) ? ch : "";
+        wordDisplay.appendChild(span);
+    }
+}
+
+function drawHangman(step) {
+    ctx.strokeStyle = "#e0e0e0";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+
+    switch (step) {
+        case 1: // Head
+            ctx.beginPath();
+            ctx.arc(200, 80, 20, 0, Math.PI * 2);
+            ctx.stroke();
+            break;
+        case 2: // Body
+            ctx.beginPath();
+            ctx.moveTo(200, 100);
+            ctx.lineTo(200, 170);
+            ctx.stroke();
+            break;
+        case 3: // Left arm
+            ctx.beginPath();
+            ctx.moveTo(200, 120);
+            ctx.lineTo(165, 150);
+            ctx.stroke();
+            break;
+        case 4: // Right arm
+            ctx.beginPath();
+            ctx.moveTo(200, 120);
+            ctx.lineTo(235, 150);
+            ctx.stroke();
+            break;
+        case 5: // Left leg
+            ctx.beginPath();
+            ctx.moveTo(200, 170);
+            ctx.lineTo(170, 215);
+            ctx.stroke();
+            break;
+        case 6: // Right leg
+            ctx.beginPath();
+            ctx.moveTo(200, 170);
+            ctx.lineTo(230, 215);
+            ctx.stroke();
+            break;
+    }
+}
+
+function drawGallows() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#555";
+    ctx.lineWidth = 4;
+    ctx.lineCap = "round";
+
+    // Base
+    ctx.beginPath();
+    ctx.moveTo(40, 250);
+    ctx.lineTo(160, 250);
+    ctx.stroke();
+
+    // Pole
+    ctx.beginPath();
+    ctx.moveTo(100, 250);
+    ctx.lineTo(100, 30);
+    ctx.stroke();
+
+    // Top bar
+    ctx.beginPath();
+    ctx.moveTo(100, 30);
+    ctx.lineTo(200, 30);
+    ctx.stroke();
+
+    // Rope
+    ctx.beginPath();
+    ctx.moveTo(200, 30);
+    ctx.lineTo(200, 60);
+    ctx.stroke();
+
+    // Brace
+    ctx.beginPath();
+    ctx.moveTo(100, 60);
+    ctx.lineTo(130, 30);
+    ctx.stroke();
+}
+
+function checkWin() {
+    return [...currentWord].every(ch => guessedLetters.has(ch));
+}
+
+function handleGuess(letter, btnElement) {
+    if (gameOver || guessedLetters.has(letter)) return;
+
+    guessedLetters.add(letter);
+
+    const btn = btnElement || keyboard.querySelector(`[data-letter="${letter}"]`);
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+
+    if (currentWord.includes(letter)) {
+        btn.classList.add("correct");
+        renderWord();
+        if (checkWin()) {
+            wins++;
+            winCount.textContent = wins;
+            message.textContent = "You won!";
+            message.className = "message win";
+            gameOver = true;
+            disableAllKeys();
+            playAgainBtn.style.display = "inline-block";
+        }
+    } else {
+        btn.classList.add("wrong");
+        wrongGuesses++;
+        drawHangman(wrongGuesses);
+        if (wrongGuesses >= MAX_WRONG) {
+            losses++;
+            lossCount.textContent = losses;
+            message.textContent = "You lost!";
+            message.className = "message lose";
+            wordReveal.textContent = "The word was: " + currentWord.toUpperCase();
+            gameOver = true;
+            revealWord();
+            disableAllKeys();
+            playAgainBtn.style.display = "inline-block";
+        }
+    }
+}
+
+function revealWord() {
+    wordDisplay.innerHTML = "";
+    for (const ch of currentWord) {
+        const span = document.createElement("span");
+        span.className = "word-letter";
+        span.textContent = ch;
+        span.style.color = guessedLetters.has(ch) ? "#fff" : "#f44336";
+        wordDisplay.appendChild(span);
+    }
+}
+
+function disableAllKeys() {
+    keyboard.querySelectorAll(".key-btn").forEach(btn => btn.disabled = true);
+}
+
+function startGame() {
+    gameOver = false;
+    wrongGuesses = 0;
+    guessedLetters.clear();
+    message.textContent = "";
+    message.className = "message";
+    wordReveal.textContent = "";
+    playAgainBtn.style.display = "none";
+
+    pickWord();
+    drawGallows();
+    buildKeyboard();
+    renderWord();
+    categoryHint.textContent = "Category: " + currentCategory;
+}
+
+// Physical keyboard support
+document.addEventListener("keydown", (e) => {
+    if (gameOver) return;
+    const key = e.key.toLowerCase();
+    if (/^[a-z]$/.test(key)) {
+        const btn = keyboard.querySelector(`[data-letter="${key}"]`);
+        if (btn && !btn.disabled) {
+            handleGuess(key, btn);
+        }
+    }
+});
+
+playAgainBtn.addEventListener("click", startGame);
+
+startGame();
+</script>
+
+</body>
+</html>

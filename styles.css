@@ -59,6 +59,40 @@ header h1:hover {
   font-size: 1.1rem;
 }
 
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.cat-btn {
+  padding: 0.5rem 1.4rem;
+  border: none;
+  border-radius: 20px;
+  background: #1a1a2e;
+  color: #777;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: capitalize;
+}
+
+.cat-btn:hover {
+  background: #2a2a3e;
+  color: #ccc;
+}
+
+.cat-btn.active {
+  background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+  color: #0f0f1a;
+}
+
 main {
   flex: 1;
   max-width: 1000px;
