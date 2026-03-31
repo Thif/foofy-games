@@ -9,6 +9,9 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
   <title>Spillverksted</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,8 +28,18 @@
 
   <header>
     <h1>Spillverksted</h1>
+    <p id="player-greeting" class="player-greeting" style="display:none"></p>
     <p class="tagline">Created with ❤️ by Forest Family</p>
   </header>
+
+  <!-- Name modal -->
+  <div id="name-modal" class="name-modal-overlay">
+    <div class="name-modal">
+      <h2>Hva heter du?</h2>
+      <input type="text" id="name-input" class="name-input" placeholder="Skriv inn navnet ditt" maxlength="30">
+      <button class="name-save-btn" onclick="savePlayerName()">Lagre</button>
+    </div>
+  </div>
 
   <main class="main-layout">
     <aside id="achievements-section" class="achievements-sidebar"></aside>
@@ -43,6 +56,7 @@
   </footer>
 
   <script src="achievements.js"></script>
+  <script src="profile.js"></script>
   <script src="games.js"></script>
   <script>renderAchievementsSection();</script>
 </body>

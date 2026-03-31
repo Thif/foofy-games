@@ -104,10 +104,41 @@ const games = [
     folder: "quiz",
     categories: ["educational", "puzzle"]
   },
+  {
+    name: "Ordbok",
+    description: "Gjett det norske ordet på 6 forsøk",
+    folder: "ordbok",
+    categories: ["puzzle", "educational"]
+  },
+  {
+    name: "Tre på rad",
+    description: "Slå AI-en i tre på rad",
+    folder: "tre-paa-rad",
+    categories: ["classic", "puzzle"]
+  },
+  {
+    name: "Kabal",
+    description: "Klassisk Klondike-kabal",
+    folder: "kabal",
+    categories: ["classic", "puzzle"]
+  },
+  {
+    name: "Geografi-quiz",
+    description: "Test geografikunnskapene dine",
+    folder: "geografi",
+    categories: ["educational", "puzzle"]
+  },
+  {
+    name: "Tegn og gjett",
+    description: "Tegn ordet og se om du klarer det",
+    folder: "tegn-og-gjett",
+    categories: ["action", "puzzle"]
+  },
 ];
 
 let excluded = [];
 let activeCategories = new Set();
+let showFavoritesOnly = false;
 
 async function loadExclusions() {
   try {
@@ -137,11 +168,27 @@ function buildCategoryFilters() {
   allBtn.className = "cat-btn active";
   allBtn.onclick = () => {
     activeCategories.clear();
+    showFavoritesOnly = false;
     container.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
     allBtn.classList.add("active");
     renderGames();
   };
   container.appendChild(allBtn);
+
+  const favBtn = document.createElement("button");
+  favBtn.textContent = "❤ Favoritter";
+  favBtn.className = "cat-btn";
+  favBtn.onclick = () => {
+    showFavoritesOnly = !showFavoritesOnly;
+    favBtn.classList.toggle("active", showFavoritesOnly);
+    if (showFavoritesOnly) {
+      allBtn.classList.remove("active");
+    } else if (activeCategories.size === 0) {
+      allBtn.classList.add("active");
+    }
+    renderGames();
+  };
+  container.appendChild(favBtn);
 
   [...allCats].sort().forEach(cat => {
     const btn = document.createElement("button");
@@ -169,11 +216,24 @@ function renderGames() {
 
   let visible = games.filter(g => !excluded.includes(g.folder));
 
+  if (showFavoritesOnly) {
+    const favs = getFavorites();
+    visible = visible.filter(g => favs.includes(g.folder));
+  }
+
   if (activeCategories.size > 0) {
     visible = visible.filter(g =>
       (g.categories || []).some(c => activeCategories.has(c))
     );
   }
+
+  // Sort favorites first
+  const favs = getFavorites();
+  visible.sort((a, b) => {
+    const aFav = favs.includes(a.folder) ? 0 : 1;
+    const bFav = favs.includes(b.folder) ? 0 : 1;
+    return aFav - bFav;
+  });
 
   if (visible.length === 0) {
     grid.innerHTML = `
@@ -186,18 +246,36 @@ function renderGames() {
 
   grid.innerHTML = visible
     .map(
-      (game) => `
-    <a class="game-card" href="/${game.folder}/">
-      <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="thumbnail placeholder" style="display:none">${game.name[0]}</div>
-      <div class="info">
-        <h2>${game.name}</h2>
-        <p>${game.description}</p>
-      </div>
-    </a>
-  `
+      (game) => {
+        const fav = isFavorite(game.folder);
+        const heartClass = fav ? 'fav-heart favorited' : 'fav-heart';
+        const heartSymbol = fav ? '&#9829;' : '&#9825;';
+        return `
+    <div class="game-card-wrapper">
+      <button class="${heartClass}" data-folder="${game.folder}" aria-label="Favoritt">${heartSymbol}</button>
+      <a class="game-card" href="/${game.folder}/">
+        <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="thumbnail placeholder" style="display:none">${game.name[0]}</div>
+        <div class="info">
+          <h2>${game.name}</h2>
+          <p>${game.description}</p>
+        </div>
+      </a>
+    </div>
+  `;
+      }
     )
     .join("");
+
+  // Attach heart click handlers
+  grid.querySelectorAll('.fav-heart').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.folder);
+      renderGames();
+    });
+  });
 }
 
 async function init() {
