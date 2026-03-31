@@ -143,6 +143,7 @@ let showFavoritesOnly = false;
 async function loadExclusions() {
   try {
     const res = await fetch("/exclude.yaml");
+    if (!res.ok) return;
     const text = await res.text();
     const match = text.match(/^excluded:\s*\[([^\]]*)\]/m);
     if (match && match[1].trim()) {
