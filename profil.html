@@ -5,197 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Min profil — Spillverksted</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0f0f1a;
-      color: #e0e0e0;
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      padding: 1.5rem;
-    }
-    a { color: #7eb8ff; text-decoration: none; }
+    /* Profile-page-specific layout */
+    body { padding: 1.5rem; display: block; }
+    a { color: var(--sage); text-decoration: none; font-weight: 500; }
     a:hover { text-decoration: underline; }
     .back-link { font-size: 0.95rem; display: inline-block; margin-bottom: 1.5rem; }
     .back-link::before { content: "\2190 "; }
 
-    .profile-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
+    .profile-header { text-align: center; margin-bottom: 2rem; }
     .avatar {
       width: 80px; height: 80px;
-      background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+      background: linear-gradient(135deg, var(--terracotta), var(--warm-gold));
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin: 0 auto 1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; margin: 0 auto 1rem;
+      box-shadow: var(--shadow-md); color: #fff;
     }
-    .profile-name {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #ffd93d;
-    }
-    .profile-subtitle {
-      color: #888;
-      font-size: 0.95rem;
-      margin-top: 0.3rem;
-    }
+    .profile-name { font-size: 2rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+    .profile-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.3rem; }
     .edit-link {
-      display: inline-block;
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
-      color: #888;
-      cursor: pointer;
-      border: 1px solid #333;
-      padding: 0.3rem 0.8rem;
-      border-radius: 6px;
+      display: inline-block; margin-top: 0.5rem; font-size: 0.85rem;
+      color: var(--text-muted); cursor: pointer; border: 1.5px solid var(--border-soft);
+      padding: 0.3rem 0.8rem; border-radius: 6px; transition: all 0.2s ease;
     }
-    .edit-link:hover { color: #ffd93d; border-color: #ffd93d; text-decoration: none; }
+    .edit-link:hover { color: var(--terracotta); border-color: var(--terracotta); text-decoration: none; }
 
     .stats-overview {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-      max-width: 700px;
-      margin: 0 auto 2rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem; max-width: 700px; margin: 0 auto 2rem;
     }
     .stat-card {
-      background: #1a1a2e;
-      border-radius: 12px;
-      padding: 1.2rem;
-      text-align: center;
+      background: var(--bg-surface); border-radius: 14px; padding: 1.2rem;
+      text-align: center; border: 1.5px solid var(--border-soft); box-shadow: var(--shadow-sm);
     }
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #ffd93d;
-    }
-    .stat-label {
-      font-size: 0.8rem;
-      color: #888;
-      margin-top: 0.3rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--terracotta); font-family: var(--font-display); }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    h2 {
-      font-size: 1.3rem;
-      color: #ccc;
-      margin-bottom: 1rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    h2 { font-size: 1.3rem; color: var(--text-primary); font-family: var(--font-display); margin-bottom: 1rem; max-width: 700px; margin-left: auto; margin-right: auto; }
 
-    .games-stats {
-      max-width: 700px;
-      margin: 0 auto 2rem;
-    }
+    .games-stats { max-width: 700px; margin: 0 auto 2rem; }
     .game-stat-row {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      background: #1a1a2e;
-      border-radius: 10px;
-      padding: 0.7rem 1rem;
-      margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      background: var(--bg-surface); border: 1.5px solid var(--border-soft);
+      border-radius: 12px; padding: 0.7rem 1rem; margin-bottom: 0.5rem;
+      box-shadow: var(--shadow-sm);
     }
     .game-stat-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .game-stat-name { flex: 1; font-weight: 600; font-size: 0.95rem; }
-    .game-stat-detail {
-      font-size: 0.8rem;
-      color: #888;
-      text-align: right;
-    }
-    .game-stat-played { color: #6bcb77; font-weight: 700; }
-    .game-stat-not-played { color: #555; }
+    .game-stat-name { flex: 1; font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+    .game-stat-detail { font-size: 0.8rem; color: var(--text-muted); text-align: right; }
+    .game-stat-played { color: var(--sage); font-weight: 700; }
+    .game-stat-not-played { color: var(--text-faint); }
 
-    .achievements-section {
-      max-width: 700px;
-      margin: 0 auto 2rem;
-    }
-    .achievements-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 0.6rem;
-    }
-    .achievement-card {
-      background: #1a1a2e;
-      border-radius: 10px;
-      padding: 0.6rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border: 2px solid transparent;
-    }
-    .achievement-card.unlocked { border-color: #ffd93d; }
-    .achievement-card.locked { opacity: 0.35; filter: grayscale(1); }
-    .achievement-icon { font-size: 1.3rem; flex-shrink: 0; }
-    .achievement-info { min-width: 0; }
-    .achievement-name {
-      font-size: 0.75rem;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .achievement-desc {
-      font-size: 0.6rem;
-      color: #777;
-      line-height: 1.2;
-    }
+    .achievements-section { max-width: 700px; margin: 0 auto 2rem; }
+    .achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.6rem; }
+
     .progress-bar-wrap {
-      max-width: 700px;
-      margin: 0 auto 1.5rem;
-      background: #1a1a2e;
-      border-radius: 8px;
-      height: 12px;
-      overflow: hidden;
+      max-width: 700px; margin: 0 auto 1.5rem;
+      background: var(--border-soft); border-radius: 8px; height: 12px; overflow: hidden;
     }
     .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #ff6b6b, #ffd93d);
-      border-radius: 8px;
-      transition: width 0.5s;
+      height: 100%; background: linear-gradient(90deg, var(--terracotta), var(--warm-gold));
+      border-radius: 8px; transition: width 0.5s;
     }
     .progress-label {
-      max-width: 700px;
-      margin: 0 auto 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #888;
+      max-width: 700px; margin: 0 auto 0.5rem;
+      display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);
     }
 
-    /* Name edit modal */
-    .name-modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7); z-index: 2000;
-      align-items: center; justify-content: center;
-    }
-    .name-modal-overlay.visible { display: flex; }
-    .name-modal {
-      background: #1a1a2e; border-radius: 16px; padding: 2rem;
-      max-width: 360px; width: 90%; text-align: center;
-    }
-    .name-modal h3 { color: #ffd93d; font-size: 1.3rem; margin-bottom: 1rem; }
+    /* Profile name-edit modal */
+    .name-modal h3 { color: var(--text-primary); font-size: 1.3rem; font-family: var(--font-display); margin-bottom: 1rem; }
     .name-modal input {
-      width: 100%; padding: 0.7rem 1rem; border: 2px solid #2a2a3e;
-      border-radius: 8px; background: #0f0f1a; color: #e0e0e0;
-      font-size: 1rem; outline: none;
+      width: 100%; padding: 0.7rem 1rem; border: 2px solid var(--border-soft);
+      border-radius: var(--radius-sm); background: var(--bg-cream); color: var(--text-primary);
+      font-size: 1rem; outline: none; font-family: var(--font-body);
     }
-    .name-modal input:focus { border-color: #ffd93d; }
+    .name-modal input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(107, 158, 132, 0.15); }
     .name-modal button {
-      margin-top: 1rem; padding: 0.6rem 2rem; border: none; border-radius: 8px;
-      background: linear-gradient(135deg, #ff6b6b, #ffd93d);
-      color: #0f0f1a; font-size: 1rem; font-weight: 700; cursor: pointer;
+      margin-top: 1rem; padding: 0.6rem 2rem; border: none; border-radius: 100px;
+      background: var(--sage); color: #fff; font-size: 1rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font-display);
+      box-shadow: 0 3px 10px rgba(107, 158, 132, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+    .name-modal button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(107, 158, 132, 0.35); }
   </style>
 </head>
 <body>
+
+<button class="theme-toggle" id="theme-toggle" aria-label="Bytt tema">
+  <span class="icon-moon">&#9789;</span>
+  <span class="icon-sun">&#9788;</span>
+</button>
 
 <a href="/" class="back-link">Tilbake til spill</a>
 
@@ -226,6 +131,7 @@
   </div>
 </div>
 
+<script src="theme.js"></script>
 <script src="achievements.js"></script>
 <script>
 const GAME_INFO = {
@@ -306,7 +212,7 @@ function loadPage() {
     const played = gamesPlayed.includes(folder);
     const perfect = perfectGames.includes(folder);
     let detail = '';
-    if (perfect) detail = '<span style="color:#ffd93d;">⭐ Perfekt</span>';
+    if (perfect) detail = '<span style="color:var(--warm-gold);">⭐ Perfekt</span>';
     else if (played) detail = '<span class="game-stat-played">✓ Spilt</span>';
     else detail = '<span class="game-stat-not-played">Ikke spilt ennå</span>';
 

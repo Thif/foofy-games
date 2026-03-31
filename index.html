@@ -11,11 +11,15 @@
   <title>Spillverksted</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a href="#games-grid" class="skip-link">Skip to games</a>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Bytt tema">
+    <span class="icon-moon">&#9789;</span>
+    <span class="icon-sun">&#9788;</span>
+  </button>
 
   <div class="vipps-banner">
     <div class="vipps-content">
@@ -55,6 +59,7 @@
     <p>&copy; 2026 Spillverksted</p>
   </footer>
 
+  <script src="theme.js"></script>
   <script src="achievements.js"></script>
   <script src="profile.js"></script>
   <script src="games.js"></script>
