@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake — Foofy Games</title>
+  <title>Snake — Spillverksted</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -54,17 +54,17 @@
 </head>
 <body>
   <div class="header">
-    <a href="/">&larr; Back to games</a>
-    <div class="score">Score: <span id="score">0</span></div>
+    <a href="/">&larr; Tilbake til spill</a>
+    <div class="score">Poeng: <span id="score">0</span></div>
   </div>
   <div style="position: relative; display: inline-block;">
     <canvas id="game" width="400" height="400"></canvas>
     <div class="overlay" id="overlay" style="width:400px;height:400px;">
-      <div>Press any arrow key to start</div>
-      <span>or WASD</span>
+      <div>Trykk en piltast for å starte</div>
+      <span>eller WASD</span>
     </div>
   </div>
-  <div class="controls">Arrow keys or WASD to move</div>
+  <div class="controls">Piltaster eller WASD for å bevege</div>
 
   <script src="/achievements.js"></script>
   <script>
@@ -143,9 +143,9 @@
       running = false;
       clearInterval(interval);
       overlay.innerHTML = `
-        <div>Game Over</div>
-        <div>Score: ${score}</div>
-        <span>Press any arrow key to restart</span>
+        <div>Spillet er over</div>
+        <div>Poeng: ${score}</div>
+        <span>Trykk en piltast for å starte på nytt</span>
       `;
       overlay.style.display = "flex";
     }

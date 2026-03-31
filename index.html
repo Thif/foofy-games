@@ -3,32 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Foofy Games — a collection of fun browser games created with love by Forest Family. Play Snake, Tetris, Pong, and more!">
-  <meta property="og:title" content="Foofy Games">
+  <meta name="description" content="Spillverksted — a collection of fun browser games created with love by Forest Family. Play Snake, Tetris, Pong, and more!">
+  <meta property="og:title" content="Spillverksted">
   <meta property="og:description" content="A collection of fun browser games created with love by Forest Family.">
   <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
-  <title>Foofy Games</title>
+  <title>Spillverksted</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a href="#games-grid" class="skip-link">Skip to games</a>
+
+  <div class="vipps-banner">
+    <div class="vipps-content">
+      <span class="vipps-text">Liker du spillene? Støtt oss!</span>
+      <a href="https://qr.vipps.no/28/2/01/031/DITT_VIPPS_NUMMER" target="_blank" rel="noopener" class="vipps-btn">
+        <img src="https://cdn.vipps.no/images/buttons/vipps-rgb-orange.svg" alt="Vipps" style="height:28px;vertical-align:middle;" onerror="this.parentElement.textContent='Doner med Vipps'">
+      </a>
+    </div>
+  </div>
+
   <header>
-    <h1>Foofy Games</h1>
+    <h1>Spillverksted</h1>
     <p class="tagline">Created with ❤️ by Forest Family</p>
   </header>
 
-  <main>
-    <div class="category-filters" id="category-filters"></div>
-    <section class="games-grid" id="games-grid">
-      <!-- Game cards are rendered from games.js -->
-    </section>
+  <main class="main-layout">
+    <aside id="achievements-section" class="achievements-sidebar"></aside>
+    <div class="games-area">
+      <div class="category-filters" id="category-filters"></div>
+      <section class="games-grid" id="games-grid">
+        <!-- Game cards are rendered from games.js -->
+      </section>
+    </div>
   </main>
 
-  <section id="achievements-section" class="achievements-section"></section>
-
   <footer>
-    <p>&copy; 2026 Foofy Games</p>
+    <p>&copy; 2026 Spillverksted</p>
   </footer>
 
   <script src="achievements.js"></script>

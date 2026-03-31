@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Breakout - Foofy Games</title>
+<title>Breakout - Spillverksted</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -74,11 +74,11 @@
 <body>
 
 <div class="top-bar">
-  <a href="/">&larr; Back to games</a>
+  <a href="/">&larr; Tilbake til spill</a>
   <div class="hud">
-    Score: <span id="score">0</span> &nbsp;|&nbsp;
-    Lives: <span id="lives">3</span> &nbsp;|&nbsp;
-    Level: <span id="level">1</span>
+    Poeng: <span id="score">0</span> &nbsp;|&nbsp;
+    Liv: <span id="lives">3</span> &nbsp;|&nbsp;
+    Niv&aring;: <span id="level">1</span>
   </div>
 </div>
 
@@ -86,8 +86,8 @@
 
 <div class="overlay" id="overlay">
   <h1 id="overlayTitle">Breakout</h1>
-  <p id="overlayMsg">Destroy all bricks to advance!</p>
-  <button class="btn" id="overlayBtn">Start Game</button>
+  <p id="overlayMsg">&Oslash;delegg alle brikkene for &aring; g&aring; videre!</p>
+  <button class="btn" id="overlayBtn">Start spill</button>
 </div>
 
 <script>
@@ -399,7 +399,7 @@
   function gameOver() {
     running = false;
     cancelAnimationFrame(animId);
-    showOverlay('Game Over', `Final score: ${score}  |  Level reached: ${level}`, 'Play Again');
+    showOverlay('Spillet er over', `Sluttpoeng: ${score}  |  N\u00e5dd niv\u00e5: ${level}`, 'Spill igjen');
     overlayBtn.onclick = startGame;
   }
 
@@ -415,7 +415,7 @@
   function init() {
     initGame();
     draw();
-    showOverlay('Breakout', 'Use mouse or arrow keys to move the paddle. Destroy all bricks!', 'Start Game');
+    showOverlay('Breakout', 'Bruk mus eller piltaster for \u00e5 flytte brettet. Ødelegg alle brikkene!', 'Start spill');
     overlayBtn.onclick = startGame;
     positionOverlay();
   }

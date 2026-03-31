@@ -1,4 +1,4 @@
-// Global achievements system for Foofy Games
+// Global achievements system for Spillverksted
 // Games call: unlockAchievement('achievement_id') or reportEvent('event_name', value)
 
 const ACHIEVEMENTS = [
@@ -216,8 +216,10 @@ function renderAchievementsSection() {
     html += `
       <div class="achievement-card ${isUnlocked ? 'unlocked' : 'locked'}" title="${a.description}">
         <span class="achievement-icon">${a.icon}</span>
-        <div class="achievement-name">${a.name}</div>
-        <div class="achievement-desc">${a.description}</div>
+        <div class="achievement-info">
+          <div class="achievement-name">${a.name}</div>
+          <div class="achievement-desc">${a.description}</div>
+        </div>
       </div>
     `;
   });

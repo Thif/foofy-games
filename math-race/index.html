@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Math Race</title>
+<title>Matteløp</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -245,40 +245,40 @@
 </head>
 <body>
 
-<a href="/" class="back-link">&larr; Back to games</a>
+<a href="/" class="back-link">&larr; Tilbake til spill</a>
 
 <div class="container">
-  <h1>Math Race</h1>
-  <p class="subtitle">Solve as many as you can in 60 seconds</p>
+  <h1>Matteløp</h1>
+  <p class="subtitle">Løs så mange du kan på 60 sekunder</p>
 
   <!-- Start Screen -->
   <div id="start-screen" class="screen active">
     <div class="instructions">
-      <strong>How to play:</strong><br>
-      Answer math questions as fast as you can!<br>
-      Operations: <span class="op-badge op-add">+</span>
+      <strong>Slik spiller du:</strong><br>
+      Svar på matteoppgaver så raskt du kan!<br>
+      Regnearter: <span class="op-badge op-add">+</span>
       <span class="op-badge op-sub">&minus;</span>
       <span class="op-badge op-mul">&times;</span>
       <span class="op-badge op-div">&divide;</span><br>
-      Difficulty increases as your score goes up.<br>
-      Build streaks for bragging rights!
+      Vanskelighetsgraden øker etter hvert som poengsummen din stiger.<br>
+      Bygg rekker og vis hva du kan!
     </div>
-    <button class="start-btn" onclick="startGame()">Start Race</button>
+    <button class="start-btn" onclick="startGame()">Start løpet</button>
   </div>
 
   <!-- Game Screen -->
   <div id="game-screen" class="screen">
     <div class="hud">
       <div class="hud-item">
-        <div class="hud-label">Time</div>
+        <div class="hud-label">Tid</div>
         <div class="hud-value timer" id="timer">60</div>
       </div>
       <div class="hud-item">
-        <div class="hud-label">Score</div>
+        <div class="hud-label">Poeng</div>
         <div class="hud-value score" id="score">0</div>
       </div>
       <div class="hud-item">
-        <div class="hud-label">Streak</div>
+        <div class="hud-label">Rekke</div>
         <div class="hud-value streak" id="streak">0</div>
       </div>
     </div>
@@ -298,26 +298,26 @@
   <!-- Results Screen -->
   <div id="results-screen" class="screen">
     <div class="results-card">
-      <h2>Race Over!</h2>
+      <h2>Løpet er over!</h2>
       <div class="final-score" id="final-score">0</div>
       <div class="result-row">
-        <span class="label">Correct</span>
+        <span class="label">Riktig</span>
         <span class="value" id="res-correct">0</span>
       </div>
       <div class="result-row">
-        <span class="label">Wrong</span>
+        <span class="label">Feil</span>
         <span class="value" id="res-wrong">0</span>
       </div>
       <div class="result-row">
-        <span class="label">Accuracy</span>
+        <span class="label">Nøyaktighet</span>
         <span class="value" id="res-accuracy">0%</span>
       </div>
       <div class="result-row">
-        <span class="label">Best Streak</span>
+        <span class="label">Beste rekke</span>
         <span class="value" id="res-streak">0</span>
       </div>
     </div>
-    <button class="play-again-btn" onclick="resetGame()">Play Again</button>
+    <button class="play-again-btn" onclick="resetGame()">Spill igjen</button>
   </div>
 </div>
 

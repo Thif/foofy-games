@@ -16,6 +16,45 @@
   top: 0;
 }
 
+.vipps-banner {
+  background: linear-gradient(135deg, #ff5b24, #ff8b3d);
+  padding: 0.6rem 1rem;
+  text-align: center;
+}
+
+.vipps-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.vipps-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.vipps-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  color: #ff5b24;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.vipps-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -112,12 +151,25 @@ header h1:hover {
   font-weight: 700;
 }
 
-main {
+.main-layout {
   flex: 1;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1rem;
   width: 100%;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.games-area {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -184,11 +236,26 @@ main {
   color: #999;
 }
 
-.achievements-section {
-  max-width: 1200px;
-  margin: 2rem auto 0;
-  padding: 0 1rem;
-  width: 100%;
+.achievements-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a3e #0f0f1a;
+}
+
+@media (max-width: 900px) {
+  .achievements-sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+  .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+  }
 }
 
 .achievements-header {
@@ -211,15 +278,18 @@ main {
 
 .achievements-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 0.8rem;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
 }
 
 .achievement-card {
   background: #1a1a2e;
   border-radius: 10px;
-  padding: 0.8rem;
-  text-align: center;
+  padding: 0.5rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   transition: transform 0.2s;
   border: 2px solid transparent;
 }
@@ -238,22 +308,31 @@ main {
 }
 
 .achievement-icon {
-  font-size: 1.8rem;
-  display: block;
-  margin-bottom: 0.3rem;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.achievement-info {
+  min-width: 0;
 }
 
 .achievement-name {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #e0e0e0;
-  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .achievement-desc {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: #777;
-  line-height: 1.3;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 footer {

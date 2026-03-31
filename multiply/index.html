@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Times Tables!</title>
+  <title>Gangetabellen!</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -165,23 +165,23 @@
 
 <!-- ══════════ SETUP SCREEN ══════════ -->
 <div id="setup-screen" class="screen active">
-  <a href="/" class="back-link">&larr; Back to games</a>
-  <h1>Times Tables!</h1>
-  <p class="subtitle">Practice makes perfect — let's go!</p>
+  <a href="/" class="back-link">&larr; Tilbake til spill</a>
+  <h1>Gangetabellen!</h1>
+  <p class="subtitle">Øvelse gjør mester — la oss begynne!</p>
 
-  <p class="section-label">Which table do you want to practice?</p>
+  <p class="section-label">Hvilken tabell vil du øve på?</p>
   <select id="table-select" class="table-select">
-    <option value="mix">Mix (random 1–10)</option>
-    <option value="1">1× table</option>
-    <option value="2">2× table</option>
-    <option value="3">3× table</option>
-    <option value="4">4× table</option>
-    <option value="5">5× table</option>
-    <option value="6">6× table</option>
-    <option value="7">7× table</option>
-    <option value="8">8× table</option>
-    <option value="9">9× table</option>
-    <option value="10">10× table</option>
+    <option value="mix">Blanding (tilfeldig 1–10)</option>
+    <option value="1">1-gangen</option>
+    <option value="2">2-gangen</option>
+    <option value="3">3-gangen</option>
+    <option value="4">4-gangen</option>
+    <option value="5">5-gangen</option>
+    <option value="6">6-gangen</option>
+    <option value="7">7-gangen</option>
+    <option value="8">8-gangen</option>
+    <option value="9">9-gangen</option>
+    <option value="10">10-gangen</option>
   </select>
 
   <button class="btn btn-primary" onclick="startGame()">Start!</button>
@@ -190,7 +190,7 @@
 <!-- ══════════ GAME SCREEN ══════════ -->
 <div id="game-screen" class="screen">
   <div class="game-header">
-    <span class="progress-label" id="q-label">Question 1 / 10</span>
+    <span class="progress-label" id="q-label">Spørsmål 1 / 10</span>
   </div>
   <div class="progress-bar">
     <div class="progress-fill" id="progress-fill" style="width:0%"></div>
@@ -210,25 +210,25 @@
 
 <!-- ══════════ RESULTS SCREEN ══════════ -->
 <div id="results-screen" class="screen">
-  <h2 id="results-title">Well done!</h2>
+  <h2 id="results-title">Bra jobbet!</h2>
 
   <div class="score-display" id="score-display">10/10</div>
   <div class="stats-grid">
     <div class="stat-box">
       <div class="stat-value" id="res-correct">10</div>
-      <div class="stat-label">Correct</div>
+      <div class="stat-label">Riktige</div>
     </div>
     <div class="stat-box">
       <div class="stat-value" id="res-wrong">0</div>
-      <div class="stat-label">Wrong</div>
+      <div class="stat-label">Feil</div>
     </div>
   </div>
 
   <div class="encouragement" id="encouragement"></div>
   <div class="leaderboard" id="leaderboard"></div>
 
-  <button class="btn btn-primary" onclick="startGame()" style="margin-top:16px">Play again!</button>
-  <button class="btn btn-ghost" onclick="show('setup-screen')">Change table</button>
+  <button class="btn btn-primary" onclick="startGame()" style="margin-top:16px">Spill igjen!</button>
+  <button class="btn btn-ghost" onclick="show('setup-screen')">Bytt tabell</button>
 </div>
 
 <script src="/achievements.js"></script>
@@ -278,7 +278,7 @@
   function showQuestion() {
     accepting = true;
     const q = questions[qIndex];
-    document.getElementById('q-label').textContent       = `Question ${qIndex + 1} / ${TOTAL}`;
+    document.getElementById('q-label').textContent       = `Spørsmål ${qIndex + 1} / ${TOTAL}`;
     document.getElementById('progress-fill').style.width = `${(qIndex / TOTAL) * 100}%`;
     document.getElementById('equation').textContent      = `${q.a} \u00d7 ${q.b} = ?`;
     document.getElementById('feedback').textContent      = '';
@@ -330,14 +330,14 @@
     if (val === correct) {
       score++;
       btn.classList.add('correct');
-      fb.textContent = ['Great job!', 'Correct!', 'Excellent!', 'Amazing!', 'Perfect!'][Math.floor(Math.random() * 5)];
+      fb.textContent = ['Flott!', 'Riktig!', 'Utmerket!', 'Fantastisk!', 'Perfekt!'][Math.floor(Math.random() * 5)];
       fb.className   = 'feedback ok';
     } else {
       btn.classList.add('wrong');
       document.querySelectorAll('.choice-btn').forEach(b => {
         if (+b.textContent === correct) b.classList.add('correct');
       });
-      fb.textContent = `The answer was ${correct}!`;
+      fb.textContent = `Svaret var ${correct}!`;
       fb.className   = 'feedback err';
     }
     setTimeout(() => {
@@ -362,12 +362,12 @@
       if (!hint1Done && timeLeft <= Math.round(QUESTION_TIME * 0.6)) {
         hint1Done = true;
         removeOneWrongOption();
-        showHintMsg('One answer removed to help you!');
+        showHintMsg('Ett svar er fjernet for å hjelpe deg!');
       }
       if (!hint2Done && timeLeft <= Math.round(QUESTION_TIME * 0.27)) {
         hint2Done = true;
         removeOneWrongOption();
-        showHintMsg("Now just two left \u2014 you\u2019ve got this!");
+        showHintMsg("Nå er det bare to igjen \u2014 du klarer det!");
       }
       if (timeLeft <= 0) { stopTimer(); autoWrong(); }
     }, 1000);
@@ -413,7 +413,7 @@
       if (+b.textContent === correct) b.classList.add('correct');
     });
     const fb = document.getElementById('feedback');
-    fb.textContent = `Time's up! The answer was ${correct}.`;
+    fb.textContent = `Tiden er ute! Svaret var ${correct}.`;
     fb.className   = 'feedback err';
     setTimeout(() => {
       qIndex++;
@@ -433,10 +433,10 @@
 
     const pct = score / TOTAL;
     let title, msg;
-    if (pct === 1)      { title = 'Perfect!';    msg = 'You got every single one right — superstar!'; }
-    else if (pct >= .8) { title = 'Well done!';  msg = 'Nearly perfect — brilliant work!'; }
-    else if (pct >= .6) { title = 'Good job!';   msg = 'Solid effort — keep practicing!'; }
-    else                { title = 'Keep going!'; msg = "Practice every day and you'll smash it!"; }
+    if (pct === 1)      { title = 'Perfekt!';       msg = 'Du fikk alle riktig — superstjerne!'; }
+    else if (pct >= .8) { title = 'Bra jobbet!';   msg = 'Nesten perfekt — strålende innsats!'; }
+    else if (pct >= .6) { title = 'Bra!';           msg = 'Solid innsats — fortsett å øve!'; }
+    else                { title = 'Fortsett!';      msg = 'Øv hver dag, så knuser du det!'; }
 
     if (score === TOTAL && typeof unlockAchievement === 'function') { unlockAchievement('multiply_perfect'); reportEvent('perfect_score', 'multiply'); }
 
@@ -460,10 +460,10 @@
     wrap.innerHTML = '';
     if (!scores.length) return;
     const title = document.createElement('p');
-    title.className = 'lb-title'; title.textContent = 'BEST SCORES';
+    title.className = 'lb-title'; title.textContent = 'BESTE RESULTATER';
     wrap.appendChild(title);
     scores.slice(0, 8).forEach((s, i) => {
-      const label = s.table === 'mix' ? 'Mix' : s.table + '×';
+      const label = s.table === 'mix' ? 'Blanding' : s.table + '×';
       const row = document.createElement('div');
       row.className = 'lb-row' + (i === 0 ? ' lb-gold' : i === 1 ? ' lb-silver' : i === 2 ? ' lb-bronze' : '');
       row.innerHTML = `<span class="lb-rank">${['🥇','🥈','🥉'][i] || (i+1)+'.'}</span>

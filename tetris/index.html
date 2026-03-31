@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,35 +117,35 @@
 </head>
 <body>
 
-<a href="/" class="back">&larr; Back to games</a>
+<a href="/" class="back">&larr; Tilbake til spill</a>
 <h1>Tetris</h1>
 
 <div class="game-wrapper">
   <canvas id="board" width="300" height="600"></canvas>
   <div class="sidebar">
     <div class="panel">
-      <h3>Next</h3>
+      <h3>Neste</h3>
       <canvas id="preview" width="100" height="80"></canvas>
     </div>
     <div class="panel">
-      <h3>Score</h3>
+      <h3>Poeng</h3>
       <div class="value" id="score">0</div>
     </div>
     <div class="panel">
-      <h3>Level</h3>
+      <h3>Niv&aring;</h3>
       <div class="value" id="level">1</div>
     </div>
     <div class="panel">
-      <h3>Lines</h3>
+      <h3>Linjer</h3>
       <div class="value" id="lines">0</div>
     </div>
   </div>
 </div>
-<div class="controls-hint">Arrow keys: Move &amp; Rotate &middot; Down: Soft drop &middot; Space: Hard drop</div>
+<div class="controls-hint">Piltaster: Flytt &amp; Roter &middot; Ned: Myk landing &middot; Mellomrom: Hard landing</div>
 
 <div id="overlay">
   <h2 id="overlay-title">Tetris</h2>
-  <div class="final-score" id="overlay-sub">Press Start to play</div>
+  <div class="final-score" id="overlay-sub">Trykk Start for &aring; spille</div>
   <button id="start-btn">Start</button>
 </div>
 
@@ -362,9 +362,9 @@
   function endGame() {
     gameOver = true;
     running = false;
-    overlayTitle.textContent = 'Game Over';
-    overlaySub.textContent = 'Score: ' + score;
-    startBtn.textContent = 'Play Again';
+    overlayTitle.textContent = 'Spillet er over';
+    overlaySub.textContent = 'Poeng: ' + score;
+    startBtn.textContent = 'Spill igjen';
     overlay.classList.remove('hidden');
   }
 

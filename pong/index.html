@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,27 +97,27 @@
 </head>
 <body>
 <div class="top-bar">
-  <a href="/">&larr; Back to games</a>
+  <a href="/">&larr; Tilbake til spill</a>
 </div>
 <h1>Pong</h1>
 <div class="scoreboard">
-  <span><span class="player-label">Player</span> <span id="playerScore">0</span></span>
+  <span><span class="player-label">Spiller</span> <span id="playerScore">0</span></span>
   <span><span class="ai-label">AI</span> <span id="aiScore">0</span></span>
 </div>
 <div class="game-wrapper">
   <canvas id="gameCanvas" width="800" height="500"></canvas>
   <div class="overlay" id="startOverlay">
     <h2>PONG</h2>
-    <p>First to 10 wins!</p>
-    <button id="startBtn">Start Game</button>
+    <p>F&oslash;rst til 10 vinner!</p>
+    <button id="startBtn">Start spill</button>
   </div>
   <div class="overlay hidden" id="gameOverOverlay">
     <h2 id="winnerText">You Win!</h2>
     <p id="finalScore"></p>
-    <button id="restartBtn">Play Again</button>
+    <button id="restartBtn">Spill igjen</button>
   </div>
 </div>
-<div class="info">W / S or Arrow Up / Down to move</div>
+<div class="info">W / S eller Pil opp / ned for &aring; bevege</div>
 
 <script>
 (function () {
@@ -268,7 +268,7 @@
     const overlay = document.getElementById('gameOverOverlay');
     const winnerText = document.getElementById('winnerText');
     const finalScore = document.getElementById('finalScore');
-    winnerText.textContent = playerScore >= WINNING_SCORE ? 'You Win!' : 'AI Wins!';
+    winnerText.textContent = playerScore >= WINNING_SCORE ? 'Du vinner!' : 'AI vinner!';
     winnerText.style.color = playerScore >= WINNING_SCORE ? '#66ccff' : '#ff6666';
     finalScore.textContent = playerScore + ' - ' + aiScore;
     overlay.classList.remove('hidden');
