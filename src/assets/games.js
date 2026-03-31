@@ -254,8 +254,8 @@ function renderGames() {
         return `
     <div class="game-card-wrapper">
       <button class="${heartClass}" data-folder="${game.folder}" aria-label="Favoritt">${heartSymbol}</button>
-      <a class="game-card" href="/${game.folder}/">
-        <img class="thumbnail" src="/${game.folder}/image.png" alt="${game.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <a class="game-card" href="/games/${game.folder}/">
+        <img class="thumbnail" src="/games/${game.folder}/image.png" alt="${game.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="thumbnail placeholder" style="display:none">${game.name[0]}</div>
         <div class="info">
           <h2>${game.name}</h2>

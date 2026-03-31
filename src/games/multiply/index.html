@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Divisjon!</title>
+  <title>Gangetabellen!</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #d85b5b 0%, #e0a051 100%);
+      background: linear-gradient(135deg, #5b67d8 0%, #9b51e0 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -38,7 +38,7 @@
     h2 { font-size: 2rem; text-align: center; color: #2d2d5e; margin-bottom: 18px; }
     .subtitle { text-align: center; color: #777; font-size: 1.05rem; margin-bottom: 28px; }
     .section-label { font-weight: 700; color: #555; font-size: 1rem; margin-bottom: 10px; }
-    .back-link { display: block; text-align: center; margin-bottom: 16px; color: #e0a051; text-decoration: none; font-size: 0.9rem; }
+    .back-link { display: block; text-align: center; margin-bottom: 16px; color: #9b51e0; text-decoration: none; font-size: 0.9rem; }
     .back-link:hover { text-decoration: underline; }
 
     .table-select {
@@ -53,7 +53,7 @@
       cursor: pointer;
       transition: border-color 0.2s;
     }
-    .table-select:focus { border-color: #e0a051; }
+    .table-select:focus { border-color: #9b51e0; }
 
     .btn {
       display: block;
@@ -68,7 +68,7 @@
     }
     .btn + .btn { margin-top: 10px; }
     .btn-primary {
-      background: linear-gradient(135deg, #d85b5b, #e0a051);
+      background: linear-gradient(135deg, #5b67d8, #9b51e0);
       color: #fff;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(155,81,224,0.45); }
@@ -86,7 +86,7 @@
     .progress-bar { height: 8px; background: #e8e8f0; border-radius: 4px; margin-bottom: 14px; overflow: hidden; }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, #d85b5b, #e0a051);
+      background: linear-gradient(90deg, #5b67d8, #9b51e0);
       border-radius: 4px;
       transition: width 0.4s ease;
     }
@@ -95,7 +95,7 @@
     .timer-bar { flex: 1; height: 10px; background: #e8e8f0; border-radius: 5px; overflow: hidden; }
     .timer-fill {
       height: 100%;
-      background: linear-gradient(90deg, #d85b5b, #e0a051);
+      background: linear-gradient(90deg, #5b67d8, #9b51e0);
       border-radius: 5px;
       transition: width 0.9s linear, background 0.4s;
     }
@@ -120,7 +120,7 @@
       background: #fafafa; color: #1e1e3f;
       transition: transform 0.15s, border-color 0.15s, background 0.15s, opacity 0.3s;
     }
-    .choice-btn:hover:not(:disabled) { border-color: #e0a051; background: #f5eeff; transform: scale(1.04); }
+    .choice-btn:hover:not(:disabled) { border-color: #9b51e0; background: #f5eeff; transform: scale(1.04); }
     .choice-btn:disabled { cursor: default; }
     .choice-btn.correct  { border-color: #38a169; background: #f0fff6; color: #38a169; }
     .choice-btn.wrong    { border-color: #e53e3e; background: #fff5f5; color: #e53e3e; animation: shake 0.35s ease; }
@@ -138,7 +138,7 @@
 
     .score-display {
       text-align: center; font-size: 5.5rem; font-weight: 900;
-      color: #e0a051; line-height: 1; margin: 12px 0 24px;
+      color: #9b51e0; line-height: 1; margin: 12px 0 24px;
     }
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
     .stat-box { background: #f7f8ff; border-radius: 14px; padding: 20px; text-align: center; }
@@ -156,9 +156,9 @@
     .lb-row.lb-gold   { background: #fef9e7; }
     .lb-row.lb-silver { background: #f4f4f4; }
     .lb-row.lb-bronze { background: #fff4ee; }
-    .lb-rank  { font-weight: 800; color: #e0a051; min-width: 22px; font-size: 0.95rem; }
+    .lb-rank  { font-weight: 800; color: #9b51e0; min-width: 22px; font-size: 0.95rem; }
     .lb-name  { flex: 1; font-weight: 600; color: #333; font-size: 0.95rem; }
-    .lb-score { font-weight: 800; color: #d85b5b; font-size: 1rem; }
+    .lb-score { font-weight: 800; color: #5b67d8; font-size: 1rem; }
   </style>
 </head>
 <body>
@@ -166,22 +166,22 @@
 <!-- ══════════ SETUP SCREEN ══════════ -->
 <div id="setup-screen" class="screen active">
   <a href="/" class="back-link">&larr; Tilbake til spill</a>
-  <h1>Divisjon!</h1>
+  <h1>Gangetabellen!</h1>
   <p class="subtitle">Øvelse gjør mester — la oss begynne!</p>
 
-  <p class="section-label">Hvilken divisor vil du øve på?</p>
+  <p class="section-label">Hvilken tabell vil du øve på?</p>
   <select id="table-select" class="table-select">
     <option value="mix">Blanding (tilfeldig 1–10)</option>
-    <option value="1">÷ 1</option>
-    <option value="2">÷ 2</option>
-    <option value="3">÷ 3</option>
-    <option value="4">÷ 4</option>
-    <option value="5">÷ 5</option>
-    <option value="6">÷ 6</option>
-    <option value="7">÷ 7</option>
-    <option value="8">÷ 8</option>
-    <option value="9">÷ 9</option>
-    <option value="10">÷ 10</option>
+    <option value="1">1-gangen</option>
+    <option value="2">2-gangen</option>
+    <option value="3">3-gangen</option>
+    <option value="4">4-gangen</option>
+    <option value="5">5-gangen</option>
+    <option value="6">6-gangen</option>
+    <option value="7">7-gangen</option>
+    <option value="8">8-gangen</option>
+    <option value="9">9-gangen</option>
+    <option value="10">10-gangen</option>
   </select>
 
   <button class="btn btn-primary" onclick="startGame()">Start!</button>
@@ -210,7 +210,7 @@
 
 <!-- ══════════ RESULTS SCREEN ══════════ -->
 <div id="results-screen" class="screen">
-  <h2 id="results-title">Well done!</h2>
+  <h2 id="results-title">Bra jobbet!</h2>
 
   <div class="score-display" id="score-display">10/10</div>
   <div class="stats-grid">
@@ -231,7 +231,7 @@
   <button class="btn btn-ghost" onclick="show('setup-screen')">Bytt tabell</button>
 </div>
 
-<script src="/achievements.js"></script>
+<script src="/assets/achievements.js"></script>
 <script>
   const TOTAL         = 10;
   const QUESTION_TIME = 15;
@@ -257,11 +257,10 @@
     const table = document.getElementById('table-select').value;
     const qs = [], seen = new Set();
     while (qs.length < TOTAL) {
-      const divisor = table === 'mix' ? rnd(1, 10) : parseInt(table);
-      const answer = rnd(1, 10);
-      const dividend = divisor * answer;
-      const k = `${dividend}/${divisor}`;
-      if (!seen.has(k)) { seen.add(k); qs.push({ dividend, divisor, ans: answer }); }
+      const a = table === 'mix' ? rnd(1, 10) : parseInt(table);
+      const b = rnd(1, 10);
+      const k = `${a}x${b}`;
+      if (!seen.has(k)) { seen.add(k); qs.push({ a, b, ans: a * b }); }
     }
     return qs;
   }
@@ -271,7 +270,7 @@
     questions = makeQuestions();
     qIndex    = 0;
     score     = 0;
-    if (typeof reportEvent === 'function') reportEvent('game_played', 'divide');
+    if (typeof reportEvent === 'function') reportEvent('game_played', 'multiply');
     show('game-screen');
     showQuestion();
   }
@@ -281,7 +280,7 @@
     const q = questions[qIndex];
     document.getElementById('q-label').textContent       = `Spørsmål ${qIndex + 1} / ${TOTAL}`;
     document.getElementById('progress-fill').style.width = `${(qIndex / TOTAL) * 100}%`;
-    document.getElementById('equation').textContent      = `${q.dividend} \u00f7 ${q.divisor} = ?`;
+    document.getElementById('equation').textContent      = `${q.a} \u00d7 ${q.b} = ?`;
     document.getElementById('feedback').textContent      = '';
     document.getElementById('feedback').className        = 'feedback';
     buildChoices(q.ans);
@@ -331,7 +330,7 @@
     if (val === correct) {
       score++;
       btn.classList.add('correct');
-      fb.textContent = ['Bra jobbet!', 'Riktig!', 'Utmerket!', 'Fantastisk!', 'Perfekt!'][Math.floor(Math.random() * 5)];
+      fb.textContent = ['Flott!', 'Riktig!', 'Utmerket!', 'Fantastisk!', 'Perfekt!'][Math.floor(Math.random() * 5)];
       fb.className   = 'feedback ok';
     } else {
       btn.classList.add('wrong');
@@ -363,7 +362,7 @@
       if (!hint1Done && timeLeft <= Math.round(QUESTION_TIME * 0.6)) {
         hint1Done = true;
         removeOneWrongOption();
-        showHintMsg('Ett svar fjernet for å hjelpe deg!');
+        showHintMsg('Ett svar er fjernet for å hjelpe deg!');
       }
       if (!hint2Done && timeLeft <= Math.round(QUESTION_TIME * 0.27)) {
         hint2Done = true;
@@ -436,10 +435,10 @@
     let title, msg;
     if (pct === 1)      { title = 'Perfekt!';       msg = 'Du fikk alle riktig — superstjerne!'; }
     else if (pct >= .8) { title = 'Bra jobbet!';   msg = 'Nesten perfekt — strålende innsats!'; }
-    else if (pct >= .6) { title = 'Godt jobbet!';  msg = 'Solid innsats — fortsett å øve!'; }
-    else                { title = 'Fortsett!';     msg = 'Øv hver dag, så knekker du koden!'; }
+    else if (pct >= .6) { title = 'Bra!';           msg = 'Solid innsats — fortsett å øve!'; }
+    else                { title = 'Fortsett!';      msg = 'Øv hver dag, så knuser du det!'; }
 
-    if (score === TOTAL && typeof unlockAchievement === 'function') { unlockAchievement('divide_perfect'); reportEvent('perfect_score', 'divide'); }
+    if (score === TOTAL && typeof unlockAchievement === 'function') { unlockAchievement('multiply_perfect'); reportEvent('perfect_score', 'multiply'); }
 
     document.getElementById('results-title').textContent = title;
     document.getElementById('encouragement').textContent = msg;
@@ -449,14 +448,14 @@
 
   function saveScore(sc) {
     const table = document.getElementById('table-select').value;
-    let scores = JSON.parse(localStorage.getItem('divScores') || '[]');
+    let scores = JSON.parse(localStorage.getItem('ttScores') || '[]');
     scores.push({ score: sc, total: TOTAL, table, date: Date.now() });
     scores.sort((a, b) => b.score - a.score || a.date - b.date);
-    localStorage.setItem('divScores', JSON.stringify(scores.slice(0, 50)));
+    localStorage.setItem('ttScores', JSON.stringify(scores.slice(0, 50)));
   }
 
   function renderLeaderboard() {
-    const scores = JSON.parse(localStorage.getItem('divScores') || '[]');
+    const scores = JSON.parse(localStorage.getItem('ttScores') || '[]');
     const wrap   = document.getElementById('leaderboard');
     wrap.innerHTML = '';
     if (!scores.length) return;
@@ -464,7 +463,7 @@
     title.className = 'lb-title'; title.textContent = 'BESTE RESULTATER';
     wrap.appendChild(title);
     scores.slice(0, 8).forEach((s, i) => {
-      const label = s.table === 'mix' ? 'Blanding' : '÷' + s.table;
+      const label = s.table === 'mix' ? 'Blanding' : s.table + '×';
       const row = document.createElement('div');
       row.className = 'lb-row' + (i === 0 ? ' lb-gold' : i === 1 ? ' lb-silver' : i === 2 ? ' lb-bronze' : '');
       row.innerHTML = `<span class="lb-rank">${['🥇','🥈','🥉'][i] || (i+1)+'.'}</span>
