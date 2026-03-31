@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -245,31 +245,31 @@
 </head>
 <body>
 
-<a href="/" class="back-link">Back to Games</a>
+<a href="/" class="back-link">Tilbake til spill</a>
 
 <div class="container">
   <!-- CATEGORY SCREEN -->
   <div id="screen-category">
-    <h1>Quiz Trivia</h1>
-    <p class="subtitle">Test your knowledge across multiple categories</p>
+    <h1>Quiz</h1>
+    <p class="subtitle">Test kunnskapen din med spennende spørsmål</p>
     <div class="category-grid">
       <button class="cat-btn all" onclick="startQuiz('all')">
-        <span class="icon">&#127922;</span>All Categories
+        <span class="icon">&#127922;</span>Alle kategorier
       </button>
-      <button class="cat-btn" onclick="startQuiz('Science')">
-        <span class="icon">&#129514;</span>Science
+      <button class="cat-btn" onclick="startQuiz('Vitenskap')">
+        <span class="icon">&#129514;</span>Vitenskap
       </button>
-      <button class="cat-btn" onclick="startQuiz('History')">
-        <span class="icon">&#127984;</span>History
+      <button class="cat-btn" onclick="startQuiz('Historie')">
+        <span class="icon">&#127984;</span>Historie
       </button>
-      <button class="cat-btn" onclick="startQuiz('Geography')">
-        <span class="icon">&#127758;</span>Geography
+      <button class="cat-btn" onclick="startQuiz('Geografi')">
+        <span class="icon">&#127758;</span>Geografi
       </button>
-      <button class="cat-btn" onclick="startQuiz('Sports')">
-        <span class="icon">&#9917;</span>Sports
+      <button class="cat-btn" onclick="startQuiz('Sport')">
+        <span class="icon">&#9917;</span>Sport
       </button>
-      <button class="cat-btn" onclick="startQuiz('Entertainment')">
-        <span class="icon">&#127916;</span>Entertainment
+      <button class="cat-btn" onclick="startQuiz('Underholdning')">
+        <span class="icon">&#127916;</span>Underholdning
       </button>
     </div>
   </div>
@@ -292,62 +292,64 @@
 
 <script>
 const QUESTIONS = [
-  // ===== SCIENCE (10) =====
-  {cat:"Science",q:"What is the chemical symbol for gold?",a:["Au","Ag","Fe","Cu"],c:0},
-  {cat:"Science",q:"How many bones are in the adult human body?",a:["206","208","196","212"],c:0},
-  {cat:"Science",q:"What planet is known as the Red Planet?",a:["Mars","Venus","Jupiter","Saturn"],c:0},
-  {cat:"Science",q:"What gas do plants absorb from the atmosphere?",a:["Carbon Dioxide","Oxygen","Nitrogen","Hydrogen"],c:0},
-  {cat:"Science",q:"What is the speed of light approximately in km/s?",a:["300,000","150,000","500,000","1,000,000"],c:0},
-  {cat:"Science",q:"What is the powerhouse of the cell?",a:["Mitochondria","Nucleus","Ribosome","Golgi apparatus"],c:0},
-  {cat:"Science",q:"What element has the atomic number 1?",a:["Hydrogen","Helium","Lithium","Carbon"],c:0},
-  {cat:"Science",q:"Which planet has the most moons in our solar system?",a:["Saturn","Jupiter","Uranus","Neptune"],c:0},
-  {cat:"Science",q:"What is the hardest natural substance on Earth?",a:["Diamond","Quartz","Topaz","Ruby"],c:0},
-  {cat:"Science",q:"What type of animal is a seahorse?",a:["Fish","Crustacean","Mammal","Reptile"],c:0},
+  // ===== VITENSKAP (10) =====
+  {cat:"Vitenskap",q:"Hva er det kjemiske symbolet for gull?",a:["Au","Ag","Fe","Cu"],c:0},
+  {cat:"Vitenskap",q:"Hvor mange bein har et voksent menneske?",a:["206","208","196","212"],c:0},
+  {cat:"Vitenskap",q:"Hvilken planet kalles den røde planeten?",a:["Mars","Venus","Jupiter","Saturn"],c:0},
+  {cat:"Vitenskap",q:"Hvilken gass tar planter opp fra atmosfæren?",a:["Karbondioksid","Oksygen","Nitrogen","Hydrogen"],c:0},
+  {cat:"Vitenskap",q:"Omtrent hvor fort er lysets hastighet i km/s?",a:["300 000","150 000","500 000","1 000 000"],c:0},
+  {cat:"Vitenskap",q:"Hva kalles cellens kraftverk?",a:["Mitokondriene","Cellekjernen","Ribosomet","Golgiapparatet"],c:0},
+  {cat:"Vitenskap",q:"Hvilket grunnstoff har atomnummer 1?",a:["Hydrogen","Helium","Litium","Karbon"],c:0},
+  {cat:"Vitenskap",q:"Hvilken planet har flest måner i solsystemet?",a:["Saturn","Jupiter","Uranus","Neptun"],c:0},
+  {cat:"Vitenskap",q:"Hva er det hardeste naturlige stoffet på jorden?",a:["Diamant","Kvarts","Topas","Rubin"],c:0},
+  {cat:"Vitenskap",q:"Hva slags dyr er en sjøhest?",a:["Fisk","Krepsdyr","Pattedyr","Reptil"],c:0},
 
-  // ===== HISTORY (10) =====
-  {cat:"History",q:"In what year did World War II end?",a:["1945","1944","1946","1943"],c:0},
-  {cat:"History",q:"Who was the first President of the United States?",a:["George Washington","John Adams","Thomas Jefferson","Benjamin Franklin"],c:0},
-  {cat:"History",q:"The ancient city of Rome was built on how many hills?",a:["7","5","9","3"],c:0},
-  {cat:"History",q:"Which empire built Machu Picchu?",a:["Inca","Aztec","Maya","Olmec"],c:0},
-  {cat:"History",q:"In what year did the Berlin Wall fall?",a:["1989","1991","1987","1990"],c:0},
-  {cat:"History",q:"Who painted the ceiling of the Sistine Chapel?",a:["Michelangelo","Leonardo da Vinci","Raphael","Donatello"],c:0},
-  {cat:"History",q:"What was the longest war in history?",a:["Reconquista","Hundred Years' War","Thirty Years' War","Punic Wars"],c:0},
-  {cat:"History",q:"Which country gifted the Statue of Liberty to the USA?",a:["France","United Kingdom","Germany","Spain"],c:0},
-  {cat:"History",q:"Who discovered penicillin?",a:["Alexander Fleming","Louis Pasteur","Joseph Lister","Robert Koch"],c:0},
-  {cat:"History",q:"The Titanic sank in which year?",a:["1912","1905","1915","1920"],c:0},
+  // ===== HISTORIE (10) =====
+  {cat:"Historie",q:"Hvilket år sluttet andre verdenskrig?",a:["1945","1944","1946","1943"],c:0},
+  {cat:"Historie",q:"Hvem var Norges første konge etter 1905?",a:["Haakon VII","Olav V","Harald V","Oscar II"],c:0},
+  {cat:"Historie",q:"Hvor mange hauger ble det gamle Roma bygget på?",a:["7","5","9","3"],c:0},
+  {cat:"Historie",q:"Hvilket imperium bygde Machu Picchu?",a:["Inkariket","Aztekerne","Mayaene","Olmekerne"],c:0},
+  {cat:"Historie",q:"Hvilket år falt Berlinmuren?",a:["1989","1991","1987","1990"],c:0},
+  {cat:"Historie",q:"Hvem malte taket i Det sixtinske kapell?",a:["Michelangelo","Leonardo da Vinci","Rafael","Donatello"],c:0},
+  {cat:"Historie",q:"Når ble Norge selvstendig fra Sverige?",a:["1905","1814","1900","1910"],c:0},
+  {cat:"Historie",q:"Hvilket land ga Frihetsgudinnen til USA?",a:["Frankrike","Storbritannia","Tyskland","Spania"],c:0},
+  {cat:"Historie",q:"Hvem oppdaget penicillin?",a:["Alexander Fleming","Louis Pasteur","Joseph Lister","Robert Koch"],c:0},
+  {cat:"Historie",q:"Hvilket år sank Titanic?",a:["1912","1905","1915","1920"],c:0},
 
-  // ===== GEOGRAPHY (9) =====
-  {cat:"Geography",q:"What is the largest desert in the world?",a:["Antarctica","Sahara","Arabian","Gobi"],c:0},
-  {cat:"Geography",q:"Which river is the longest in the world?",a:["Nile","Amazon","Yangtze","Mississippi"],c:0},
-  {cat:"Geography",q:"What is the smallest country in the world?",a:["Vatican City","Monaco","San Marino","Liechtenstein"],c:0},
-  {cat:"Geography",q:"On which continent is the Sahara Desert located?",a:["Africa","Asia","Australia","South America"],c:0},
-  {cat:"Geography",q:"What is the capital of Australia?",a:["Canberra","Sydney","Melbourne","Brisbane"],c:0},
-  {cat:"Geography",q:"Which ocean is the largest?",a:["Pacific","Atlantic","Indian","Arctic"],c:0},
-  {cat:"Geography",q:"Mount Everest is located in which mountain range?",a:["Himalayas","Andes","Alps","Rockies"],c:0},
-  {cat:"Geography",q:"What country has the most natural lakes?",a:["Canada","Finland","Sweden","Russia"],c:0},
-  {cat:"Geography",q:"What is the capital of Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0},
+  // ===== GEOGRAFI (10) =====
+  {cat:"Geografi",q:"Hva er den største ørkenen i verden?",a:["Antarktis","Sahara","Den arabiske ørken","Gobi"],c:0},
+  {cat:"Geografi",q:"Hvilken elv er den lengste i verden?",a:["Nilen","Amazonas","Yangtze","Mississippi"],c:0},
+  {cat:"Geografi",q:"Hva er det minste landet i verden?",a:["Vatikanstaten","Monaco","San Marino","Liechtenstein"],c:0},
+  {cat:"Geografi",q:"Hva er hovedstaden i Australia?",a:["Canberra","Sydney","Melbourne","Brisbane"],c:0},
+  {cat:"Geografi",q:"Hvilket hav er størst?",a:["Stillehavet","Atlanterhavet","Indiahavet","Nordishavet"],c:0},
+  {cat:"Geografi",q:"I hvilken fjellkjede ligger Mount Everest?",a:["Himalaya","Andesfjellene","Alpene","Rocky Mountains"],c:0},
+  {cat:"Geografi",q:"Hva er hovedstaden i Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0},
+  {cat:"Geografi",q:"Hva er Norges lengste elv?",a:["Glomma","Drammenselva","Numedalslågen","Tanaelva"],c:0},
+  {cat:"Geografi",q:"Hva er det høyeste fjellet i Norge?",a:["Galdhøpiggen","Glittertind","Store Skagastølstind","Snøhetta"],c:0},
+  {cat:"Geografi",q:"Hvilket land har flest naturlige innsjøer?",a:["Canada","Finland","Sverige","Russland"],c:0},
 
-  // ===== SPORTS (9) =====
-  {cat:"Sports",q:"How many players are on a standard soccer team on the field?",a:["11","10","9","12"],c:0},
-  {cat:"Sports",q:"In which sport would you perform a slam dunk?",a:["Basketball","Volleyball","Tennis","Handball"],c:0},
-  {cat:"Sports",q:"How many Grand Slam tennis tournaments are there per year?",a:["4","5","3","6"],c:0},
-  {cat:"Sports",q:"Which country hosted the 2016 Summer Olympics?",a:["Brazil","United Kingdom","China","Japan"],c:0},
-  {cat:"Sports",q:"How long is a marathon in miles (approximately)?",a:["26.2","24.5","28.1","30.0"],c:0},
-  {cat:"Sports",q:"In which sport is the term 'birdie' used?",a:["Golf","Badminton","Cricket","Tennis"],c:0},
-  {cat:"Sports",q:"What is the national sport of Canada?",a:["Lacrosse","Ice Hockey","Curling","Baseball"],c:0},
-  {cat:"Sports",q:"Which country won the first FIFA World Cup in 1930?",a:["Uruguay","Brazil","Argentina","Italy"],c:0},
-  {cat:"Sports",q:"How many points is a touchdown worth in American football?",a:["6","7","3","4"],c:0},
+  // ===== SPORT (10) =====
+  {cat:"Sport",q:"Hvor mange spillere er det på et fotballag på banen?",a:["11","10","9","12"],c:0},
+  {cat:"Sport",q:"I hvilken idrett utfører man en slam dunk?",a:["Basketball","Volleyball","Tennis","Håndball"],c:0},
+  {cat:"Sport",q:"Hvor mange Grand Slam-turneringer i tennis er det per år?",a:["4","5","3","6"],c:0},
+  {cat:"Sport",q:"Hvilket land arrangerte sommer-OL i 2016?",a:["Brasil","Storbritannia","Kina","Japan"],c:0},
+  {cat:"Sport",q:"Omtrent hvor langt er et maraton i kilometer?",a:["42,2","39,5","45,1","48,0"],c:0},
+  {cat:"Sport",q:"I hvilken idrett brukes uttrykket 'birdie'?",a:["Golf","Badminton","Cricket","Tennis"],c:0},
+  {cat:"Sport",q:"Hvilket land vant det første FIFA-VM i 1930?",a:["Uruguay","Brasil","Argentina","Italia"],c:0},
+  {cat:"Sport",q:"Hva er Norges nasjonalsport?",a:["Langrenn","Fotball","Håndball","Skiskyting"],c:0},
+  {cat:"Sport",q:"Hvem har flest VM-gull i skiskyting?",a:["Ole Einar Bjørndalen","Johannes Thingnes Bø","Martin Fourcade","Raphaël Poirée"],c:0},
+  {cat:"Sport",q:"Hvor mange poeng er et mål verdt i håndball?",a:["1","2","3","Det varierer"],c:0},
 
-  // ===== ENTERTAINMENT (9) =====
-  {cat:"Entertainment",q:"Who directed the movie 'Jurassic Park'?",a:["Steven Spielberg","James Cameron","George Lucas","Ridley Scott"],c:0},
-  {cat:"Entertainment",q:"What is the name of the fictional continent in Game of Thrones?",a:["Westeros","Narnia","Middle-earth","Tamriel"],c:0},
-  {cat:"Entertainment",q:"Which band recorded the album 'Abbey Road'?",a:["The Beatles","The Rolling Stones","Led Zeppelin","Pink Floyd"],c:0},
-  {cat:"Entertainment",q:"In the movie 'The Matrix', what color pill does Neo take?",a:["Red","Blue","Green","Yellow"],c:0},
-  {cat:"Entertainment",q:"What is the highest-grossing film of all time (unadjusted)?",a:["Avatar","Avengers: Endgame","Titanic","Star Wars: The Force Awakens"],c:0},
-  {cat:"Entertainment",q:"Who played Jack Sparrow in Pirates of the Caribbean?",a:["Johnny Depp","Orlando Bloom","Brad Pitt","Robert Downey Jr."],c:0},
-  {cat:"Entertainment",q:"What year was the original Super Mario Bros. released?",a:["1985","1983","1987","1990"],c:0},
-  {cat:"Entertainment",q:"Which TV show features a character named Walter White?",a:["Breaking Bad","Better Call Saul","The Wire","Ozark"],c:0},
-  {cat:"Entertainment",q:"Who wrote the Harry Potter book series?",a:["J.K. Rowling","J.R.R. Tolkien","C.S. Lewis","Suzanne Collins"],c:0},
+  // ===== UNDERHOLDNING (9) =====
+  {cat:"Underholdning",q:"Hvem regisserte filmen 'Jurassic Park'?",a:["Steven Spielberg","James Cameron","George Lucas","Ridley Scott"],c:0},
+  {cat:"Underholdning",q:"Hva heter det fiktive kontinentet i Game of Thrones?",a:["Westeros","Narnia","Midgard","Tamriel"],c:0},
+  {cat:"Underholdning",q:"Hvilket band spilte inn albumet 'Abbey Road'?",a:["The Beatles","The Rolling Stones","Led Zeppelin","Pink Floyd"],c:0},
+  {cat:"Underholdning",q:"Hvilken farge har pillen Neo tar i filmen 'The Matrix'?",a:["Rød","Blå","Grønn","Gul"],c:0},
+  {cat:"Underholdning",q:"Hva er den mest innbringende filmen gjennom tidene?",a:["Avatar","Avengers: Endgame","Titanic","Star Wars: The Force Awakens"],c:0},
+  {cat:"Underholdning",q:"Hvem spiller Jack Sparrow i Pirates of the Caribbean?",a:["Johnny Depp","Orlando Bloom","Brad Pitt","Robert Downey Jr."],c:0},
+  {cat:"Underholdning",q:"Hvilket år ble det originale Super Mario Bros. utgitt?",a:["1985","1983","1987","1990"],c:0},
+  {cat:"Underholdning",q:"Hvilken TV-serie har en karakter som heter Walter White?",a:["Breaking Bad","Better Call Saul","The Wire","Ozark"],c:0},
+  {cat:"Underholdning",q:"Hvem skrev Harry Potter-bøkene?",a:["J.K. Rowling","J.R.R. Tolkien","C.S. Lewis","Suzanne Collins"],c:0},
 ];
 
 let currentQuiz = [];
@@ -397,7 +399,7 @@ function showScreen(name) {
 function showQuestion() {
   answered = false;
   const q = currentQuiz[currentIndex];
-  document.getElementById('q-counter').textContent = `Question ${currentIndex + 1} / ${currentQuiz.length}`;
+  document.getElementById('q-counter').textContent = `Spørsmål ${currentIndex + 1} / ${currentQuiz.length}`;
   document.getElementById('q-category').textContent = q.cat;
   document.getElementById('q-text').textContent = q.q;
   document.getElementById('progress').style.width = ((currentIndex) / currentQuiz.length * 100) + '%';
@@ -442,7 +444,7 @@ function timeUp() {
     btn.classList.add('disabled');
     if (i === q.correct) btn.classList.add('correct');
   });
-  results.push({ q: q.q, cat: q.cat, correct: q.answers[q.correct], yours: 'No answer (time up)', wasCorrect: false });
+  results.push({ q: q.q, cat: q.cat, correct: q.answers[q.correct], yours: 'Ikke besvart (tiden ute)', wasCorrect: false });
   setTimeout(nextQuestion, 1500);
 }
 
@@ -492,28 +494,28 @@ function showResults() {
 
   let reviewHTML = results.map(r => {
     const cls = r.wasCorrect ? 'was-correct' : 'was-wrong';
-    let inner = `<div class="review-q">${r.q}</div><div class="review-a">Correct answer: <span>${r.correct}</span></div>`;
-    if (!r.wasCorrect) inner += `<div class="review-your">Your answer: ${r.yours}</div>`;
+    let inner = `<div class="review-q">${r.q}</div><div class="review-a">Riktig svar: <span>${r.correct}</span></div>`;
+    if (!r.wasCorrect) inner += `<div class="review-your">Ditt svar: ${r.yours}</div>`;
     return `<div class="review-item ${cls}">${inner}</div>`;
   }).join('');
 
   document.getElementById('screen-results').innerHTML = `
-    <h1>Results</h1>
+    <h1>Resultater</h1>
     <div class="results-card">
       <div class="score-circle ${grade}">
         <div class="score-num">${score}/${total}</div>
-        <div class="score-label">Score</div>
+        <div class="score-label">Poeng</div>
       </div>
       <div class="stats-row">
-        <div class="stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Accuracy</div></div>
-        <div class="stat"><div class="stat-val">${score}</div><div class="stat-lbl">Correct</div></div>
-        <div class="stat"><div class="stat-val">${total - score}</div><div class="stat-lbl">Wrong</div></div>
+        <div class="stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Nøyaktighet</div></div>
+        <div class="stat"><div class="stat-val">${score}</div><div class="stat-lbl">Riktige</div></div>
+        <div class="stat"><div class="stat-val">${total - score}</div><div class="stat-lbl">Feil</div></div>
       </div>
-      <button class="btn" onclick="startQuiz('all')">Play Again (All)</button>
-      <button class="btn btn-secondary" onclick="backToCategories()">Choose Category</button>
+      <button class="btn" onclick="startQuiz('all')">Spill igjen (alle)</button>
+      <button class="btn btn-secondary" onclick="backToCategories()">Velg kategori</button>
     </div>
     <div class="review-section">
-      <h3>Answer Review</h3>
+      <h3>Gjennomgang av svar</h3>
       ${reviewHTML}
     </div>
   `;

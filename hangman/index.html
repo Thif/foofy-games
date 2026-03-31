@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -203,12 +203,12 @@
 </head>
 <body>
 
-<a href="/" class="back-link">Back to games</a>
+<a href="/" class="back-link">Tilbake til spill</a>
 
 <h1>Hangman</h1>
 <div class="score-board">
-    Wins: <span class="wins" id="winCount">0</span> &nbsp;|&nbsp;
-    Losses: <span class="losses" id="lossCount">0</span>
+    Vunnet: <span class="wins" id="winCount">0</span> &nbsp;|&nbsp;
+    Tapt: <span class="losses" id="lossCount">0</span>
 </div>
 
 <div class="game-area">
@@ -218,73 +218,74 @@
     <div class="message" id="message"></div>
     <div class="word-reveal" id="wordReveal"></div>
     <div class="keyboard" id="keyboard"></div>
-    <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+    <button class="play-again-btn" id="playAgainBtn">Spill igjen</button>
 </div>
 
 <script>
 const WORDS = [
-    // Animals
-    { word: "elephant", category: "Animal" },
-    { word: "giraffe", category: "Animal" },
-    { word: "penguin", category: "Animal" },
-    { word: "dolphin", category: "Animal" },
-    { word: "cheetah", category: "Animal" },
-    { word: "kangaroo", category: "Animal" },
-    { word: "octopus", category: "Animal" },
-    { word: "panther", category: "Animal" },
-    { word: "flamingo", category: "Animal" },
-    { word: "tortoise", category: "Animal" },
-    // Countries
-    { word: "brazil", category: "Country" },
-    { word: "japan", category: "Country" },
-    { word: "germany", category: "Country" },
-    { word: "australia", category: "Country" },
-    { word: "canada", category: "Country" },
-    { word: "mexico", category: "Country" },
-    { word: "norway", category: "Country" },
-    { word: "portugal", category: "Country" },
-    { word: "thailand", category: "Country" },
-    { word: "argentina", category: "Country" },
-    // Food
-    { word: "spaghetti", category: "Food" },
-    { word: "pancake", category: "Food" },
-    { word: "avocado", category: "Food" },
-    { word: "chocolate", category: "Food" },
-    { word: "hamburger", category: "Food" },
-    { word: "sushi", category: "Food" },
-    { word: "croissant", category: "Food" },
-    { word: "burrito", category: "Food" },
-    { word: "pretzel", category: "Food" },
-    { word: "tiramisu", category: "Food" },
-    // Sports
+    // Dyr
+    { word: "elefant", category: "Dyr" },
+    { word: "sjiraff", category: "Dyr" },
+    { word: "pingvin", category: "Dyr" },
+    { word: "delfin", category: "Dyr" },
+    { word: "gepard", category: "Dyr" },
+    { word: "kenguru", category: "Dyr" },
+    { word: "blekksprut", category: "Dyr" },
+    { word: "flamingo", category: "Dyr" },
+    { word: "skilpadde", category: "Dyr" },
+    { word: "ekorn", category: "Dyr" },
+    { word: "isbjørn", category: "Dyr" },
+    // Land
+    { word: "brasil", category: "Land" },
+    { word: "japan", category: "Land" },
+    { word: "tyskland", category: "Land" },
+    { word: "australia", category: "Land" },
+    { word: "frankrike", category: "Land" },
+    { word: "mexico", category: "Land" },
+    { word: "norge", category: "Land" },
+    { word: "portugal", category: "Land" },
+    { word: "sverige", category: "Land" },
+    { word: "island", category: "Land" },
+    // Mat
+    { word: "spaghetti", category: "Mat" },
+    { word: "pannekake", category: "Mat" },
+    { word: "sjokolade", category: "Mat" },
+    { word: "hamburger", category: "Mat" },
+    { word: "brunost", category: "Mat" },
+    { word: "lefse", category: "Mat" },
+    { word: "vaffel", category: "Mat" },
+    { word: "fiskekake", category: "Mat" },
+    { word: "kjøttkake", category: "Mat" },
+    { word: "jordbær", category: "Mat" },
+    // Sport
     { word: "basketball", category: "Sport" },
-    { word: "swimming", category: "Sport" },
+    { word: "svømming", category: "Sport" },
     { word: "volleyball", category: "Sport" },
     { word: "badminton", category: "Sport" },
-    { word: "cricket", category: "Sport" },
-    { word: "archery", category: "Sport" },
-    { word: "fencing", category: "Sport" },
-    { word: "gymnastics", category: "Sport" },
-    { word: "marathon", category: "Sport" },
-    { word: "wrestling", category: "Sport" },
-    // Music
-    { word: "guitar", category: "Music" },
-    { word: "trumpet", category: "Music" },
-    { word: "piano", category: "Music" },
-    { word: "violin", category: "Music" },
-    { word: "saxophone", category: "Music" },
-    { word: "harmonica", category: "Music" },
-    { word: "accordion", category: "Music" },
-    { word: "ukulele", category: "Music" },
-    // Science
-    { word: "molecule", category: "Science" },
-    { word: "gravity", category: "Science" },
-    { word: "neutron", category: "Science" },
-    { word: "oxygen", category: "Science" },
-    { word: "telescope", category: "Science" },
-    { word: "eclipse", category: "Science" },
-    { word: "volcano", category: "Science" },
-    { word: "chromosome", category: "Science" }
+    { word: "fotball", category: "Sport" },
+    { word: "håndball", category: "Sport" },
+    { word: "skiskyting", category: "Sport" },
+    { word: "langrenn", category: "Sport" },
+    { word: "bryting", category: "Sport" },
+    { word: "friidrett", category: "Sport" },
+    // Musikk
+    { word: "gitar", category: "Musikk" },
+    { word: "trompet", category: "Musikk" },
+    { word: "piano", category: "Musikk" },
+    { word: "fiolin", category: "Musikk" },
+    { word: "saksofon", category: "Musikk" },
+    { word: "trekkspill", category: "Musikk" },
+    { word: "fløyte", category: "Musikk" },
+    { word: "tromme", category: "Musikk" },
+    // Vitenskap
+    { word: "molekyl", category: "Vitenskap" },
+    { word: "tyngdekraft", category: "Vitenskap" },
+    { word: "nøytron", category: "Vitenskap" },
+    { word: "oksygen", category: "Vitenskap" },
+    { word: "teleskop", category: "Vitenskap" },
+    { word: "formørkelse", category: "Vitenskap" },
+    { word: "vulkan", category: "Vitenskap" },
+    { word: "kromosom", category: "Vitenskap" }
 ];
 
 const MAX_WRONG = 6;
@@ -315,8 +316,8 @@ function pickWord() {
 
 function buildKeyboard() {
     keyboard.innerHTML = "";
-    for (let i = 0; i < 26; i++) {
-        const letter = String.fromCharCode(65 + i);
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ";
+    for (const letter of letters) {
         const btn = document.createElement("button");
         btn.className = "key-btn";
         btn.textContent = letter;
@@ -436,7 +437,7 @@ function handleGuess(letter, btnElement) {
         if (checkWin()) {
             wins++;
             winCount.textContent = wins;
-            message.textContent = "You won!";
+            message.textContent = "Du vant!";
             message.className = "message win";
             gameOver = true;
             disableAllKeys();
@@ -449,9 +450,9 @@ function handleGuess(letter, btnElement) {
         if (wrongGuesses >= MAX_WRONG) {
             losses++;
             lossCount.textContent = losses;
-            message.textContent = "You lost!";
+            message.textContent = "Du tapte!";
             message.className = "message lose";
-            wordReveal.textContent = "The word was: " + currentWord.toUpperCase();
+            wordReveal.textContent = "Ordet var: " + currentWord.toUpperCase();
             gameOver = true;
             revealWord();
             disableAllKeys();
@@ -488,14 +489,14 @@ function startGame() {
     drawGallows();
     buildKeyboard();
     renderWord();
-    categoryHint.textContent = "Category: " + currentCategory;
+    categoryHint.textContent = "Kategori: " + currentCategory;
 }
 
 // Physical keyboard support
 document.addEventListener("keydown", (e) => {
     if (gameOver) return;
     const key = e.key.toLowerCase();
-    if (/^[a-z]$/.test(key)) {
+    if (/^[a-zæøå]$/.test(key)) {
         const btn = keyboard.querySelector(`[data-letter="${key}"]`);
         if (btn && !btn.disabled) {
             handleGuess(key, btn);

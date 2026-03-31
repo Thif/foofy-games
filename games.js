@@ -81,12 +81,6 @@ const games = [
     categories: ["classic", "puzzle"]
   },
   {
-    name: "Word Scramble",
-    description: "Unscramble letters to form words",
-    folder: "word-scramble",
-    categories: ["educational", "puzzle"]
-  },
-  {
     name: "Math Race",
     description: "Solve +, -, x, ÷ against the clock",
     folder: "math-race",
@@ -103,12 +97,6 @@ const games = [
     description: "Slide and merge tiles to reach 2048",
     folder: "2048",
     categories: ["classic", "puzzle"]
-  },
-  {
-    name: "Typing Speed",
-    description: "How fast can you type?",
-    folder: "typing-speed",
-    categories: ["educational", "arcade"]
   },
   {
     name: "Quiz",
